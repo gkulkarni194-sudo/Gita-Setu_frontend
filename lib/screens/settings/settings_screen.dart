@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../local/profile_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
+import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -103,6 +104,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _openAdminLogin() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
     );
   }
 
@@ -272,6 +280,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: _deleteAccount,
                       trailing: const Icon(Icons.info_outline,
                           size: 16, color: Colors.red)),
+                ]),
+                const SizedBox(height: 20),
+
+                _buildSectionTitle('Admin'),
+                _buildCard(children: [
+                  _buildRow('Admin Passkey Access', '',
+                      textColor: AppColors.primary,
+                      onTap: _openAdminLogin,
+                      trailing: const Icon(Icons.admin_panel_settings,
+                          size: 16, color: AppColors.primary)),
                 ]),
 
                 const SizedBox(height: 32),

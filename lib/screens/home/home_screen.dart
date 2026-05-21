@@ -9,6 +9,7 @@ import '../../widgets/flower_background.dart';
 import '../../models/shloka_model.dart';
 import '../../providers/app_providers.dart';
 import '../gita/chapter_list_screen.dart';
+import '../mentor/mentor_list_screen.dart';
 import '../mood/mood_input_screen.dart';
 import '../journal/journal_home_screen.dart';
 import '../settings/settings_screen.dart';
@@ -202,6 +203,18 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => const ChapterListScreen(),
+                  ),
+                ),
+                fullWidth: true,
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                '🧘',
+                'Contact Guru',
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MentorListScreen(),
                   ),
                 ),
                 fullWidth: true,

@@ -45,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: 16),
-                    _buildHeader(profile),
+                    _buildHeader(profile, progress),
                     const SizedBox(height: 28),
                     _buildProgressBar(progress),
                     const SizedBox(height: 28),
@@ -62,7 +62,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(ProfileModel? profile) {
+  Widget _buildHeader(ProfileModel? profile, UserProgress progress) {
     return Column(
       children: [
         Center(

@@ -1,0 +1,29 @@
+﻿Analyzing GitaSetu-frontend-main...                             
+
+warning - The declaration '_parseInt' isn't referenced. Try removing the declaration of '_parseInt' - lib\models\guru.dart:55:14 - unused_element
+  error - Directives must appear before any declarations. Try moving the directive before any declarations - lib\providers\app_providers.dart:34:1 - directive_after_declaration
+  error - Directives must appear before any declarations. Try moving the directive before any declarations - lib\providers\app_providers.dart:35:1 - directive_after_declaration
+warning - Unused import: '../repositories/ai_repository.dart'. Try removing the import directive - lib\providers\chat_provider.dart:2:8 - unused_import
+warning - Dead code. Try removing the code, or fixing the code before it so that it can be reached - lib\screens\admin\admin_mentor_screen.dart:90:45 - dead_code
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\screens\admin\admin_mentor_screen.dart:107:43 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\screens\admin\admin_mentor_screen.dart:108:50 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\screens\admin\admin_mentor_screen.dart:113:48 - use_build_context_synchronously
+  error - Expected to find ';' - lib\screens\admin\admin_mentor_screen.dart:374:5 - expected_token
+warning - Dead code. Try removing the code, or fixing the code before it so that it can be reached - lib\screens\admin\admin_mentor_screen.dart:374:6 - dead_code
+  error - Expected an identifier - lib\screens\admin\admin_mentor_screen.dart:374:6 - missing_identifier
+  error - Unexpected text ';'. Try removing the text - lib\screens\admin\admin_mentor_screen.dart:374:6 - unexpected_token
+   info - Unnecessary empty statement. Try removing the empty statement or restructuring the code - lib\screens\admin\admin_mentor_screen.dart:374:7 - empty_statements
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\screens\home\home_screen.dart:39:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\screens\home\home_screen.dart:40:18 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:44:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:207:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:210:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:223:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:258:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\home\home_screen.dart:306:37 - deprecated_member_use
+warning - The value of the local variable 'mentorsAsync' isn't used. Try removing the variable or using it - lib\screens\mentor\mentor_list_screen.dart:32:11 - unused_local_variable
+  error - Undefined name 'gurusAsync'. Try correcting the name to one that is defined, or defining the name - lib\screens\mentor\mentor_list_screen.dart:67:24 - undefined_identifier
+  error - The method 'MentorProfileScreen' isn't defined for the type '_MentorListScreenState'. Try correcting the name to the name of an existing method, or defining a method named 'MentorProfileScreen' - lib\screens\mentor\mentor_list_screen.dart:275:39 - undefined_method
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\screens\mood\mood_input_screen.dart:61:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\screens\splash\splash_screen.dart:55:29 - prefer_const_constructors
+

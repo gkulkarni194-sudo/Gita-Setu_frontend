@@ -1,0 +1,25 @@
+﻿Analyzing GitaSetu-frontend-main...
+
+  error - lib\repositories\gita_repository.dart:10:12 - A value of type 'Future<ApiResponse<dynamic>>' can't be returned from the method 'getDailyShloka' because it has a return type of 'Future<ShlokaModel?>'. - return_of_invalid_type
+  error - lib\repositories\gita_repository.dart:14:12 - A value of type 'Future<ApiResponse<dynamic>>' can't be returned from the method 'getChapterShlokas' because it has a return type of 'Future<List<ShlokaModel>>'. - return_of_invalid_type
+  error - lib\repositories\mentor_repository.dart:10:36 - The method 'get' isn't defined for the type 'ApiService'. Try correcting the name to the name of an existing method, or defining a method named 'get'. - undefined_method
+  error - lib\repositories\mentor_repository.dart:27:36 - The method 'post' isn't defined for the type 'ApiService'. Try correcting the name to the name of an existing method, or defining a method named 'post'. - undefined_method
+  error - lib\screens\admin\admin_home_screen.dart:57:6 - Expected to find ')'. - expected_token
+  error - lib\screens\admin\admin_mentor_screen.dart:379:6 - Expected to find ')'. - expected_token
+  error - lib\screens\admin\admin_settings_screen.dart:116:6 - Expected to find ')'. - expected_token
+  error - lib\screens\home\home_screen.dart:96:39 - Instance member 'getDailyShloka' can't be accessed using static access. - static_access_to_instance_member
+  error - lib\screens\home\home_screen.dart:98:24 - A value of type 'ApiResponse<dynamic>' can't be assigned to a variable of type 'ShlokaModel?'. Try changing the type of the variable, or casting the right-hand type to 'ShlokaModel?'. - invalid_assignment
+warning - lib\screens\home\home_screen.dart:10:8 - Unused import: '../mentor/mentor_list_screen.dart'. Try removing the import directive. - unused_import
+warning - lib\screens\home\home_screen.dart:11:8 - Unused import: '../profile/profile_screen.dart'. Try removing the import directive. - unused_import
+   info - lib\screens\home\home_screen.dart:40:19 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib\screens\home\home_screen.dart:41:18 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib\screens\home\home_screen.dart:45:37 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\home\home_screen.dart:206:50 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\home\home_screen.dart:209:35 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\home\home_screen.dart:222:35 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\home\home_screen.dart:257:37 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\home\home_screen.dart:305:37 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\mood\mood_input_screen.dart:61:22 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib\screens\splash\splash_screen.dart:55:29 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+
+21 issues found.

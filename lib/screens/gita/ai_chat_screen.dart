@@ -24,6 +24,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   String? _lastFailedQuestion;
 
   Future<void> _sendMessage() async {
+    if (_loading) return;
     final question = _controller.text.trim();
     if (question.isEmpty) return;
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:gitasetu_flutter/main.dart';
+import 'package:gitasetu_flutter/local/cache_local_service.dart';
 import 'package:gitasetu_flutter/local/journal_local_service.dart';
 import 'package:gitasetu_flutter/local/profile_local_service.dart';
 import 'package:gitasetu_flutter/local/progress_local_service.dart';
@@ -18,6 +19,8 @@ void main() {
     await Hive.openBox<JournalEntry>(JournalLocalService.boxName);
     await Hive.openBox<dynamic>(ProfileLocalService.boxName);
     await Hive.openBox<dynamic>(ProgressLocalService.boxName);
+    final cacheBox = await Hive.openBox<dynamic>(CacheLocalService.boxName);
+    await CacheLocalService(cacheBox).persistStaticData();
 
     await tester.pumpWidget(const GitaSetuApp());
 

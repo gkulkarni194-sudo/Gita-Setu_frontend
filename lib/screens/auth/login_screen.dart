@@ -25,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    if (_loading) return;
     final password = _passwordController.text;
     if (password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

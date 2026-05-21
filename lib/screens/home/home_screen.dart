@@ -85,29 +85,6 @@ class HomeTab extends ConsumerStatefulWidget {
 }
 
 class _HomeTabState extends ConsumerState<HomeTab> {
-  ShlokaModel? _dailyShloka;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDailyShloka();
-  }
-
-  Future<void> _loadDailyShloka() async {
-    try {
-      final shloka = await ref.read(gitaRepositoryProvider).getDailyShloka();
-      if (mounted) {
-        setState(() {
-          _dailyShloka = shloka;
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final profileBox = Hive.box<dynamic>(ProfileLocalService.boxName);
@@ -123,6 +100,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           builder: (context, _) {
             final profile = ProfileLocalService(profileBox).getProfile();
             final progress = ProgressLocalService(progressBox).getProgress();
+            final dailyShloka = ref.watch(dailyShlokaProvider);
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -160,7 +138,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               const SizedBox(height: 28),
 
               // Daily Shloka Card
-              _buildDailyShlokaCard(),
+              _buildDailyShlokaCard(dailyShloka),
               const SizedBox(height: 20),
 
               // Quick Action Buttons
@@ -228,7 +206,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     );
   }
 
-  Widget _buildDailyShlokaCard() {
+  Widget _buildDailyShlokaCard(AsyncValue<ShlokaModel?> dailyShloka) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -274,33 +252,49 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           ),
           const SizedBox(height: 16),
 
-          if (_loading)
-            const Center(child: CircularProgressIndicator())
-          else if (_dailyShloka != null) ...[
-            Text(
-              _dailyShloka!.sanskrit,
-              style: GoogleFonts.tiroDevanagariSanskrit(
-                fontSize: 18,
-                color: AppColors.darkBrown,
-                height: 1.8,
-              ),
+          dailyShloka.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => Text(
+              'Daily shloka is unavailable offline until it has been cached.',
+              style: GoogleFonts.lato(color: AppColors.warmGrey),
             ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: AppColors.gold.withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _dailyShloka!.english,
-              style: GoogleFonts.cormorantGaramond(
-                fontSize: 15,
-                color: AppColors.warmGrey,
-                fontStyle: FontStyle.italic,
-                height: 1.7,
-              ),
-            ),
-          ],
+            data: (shloka) {
+              if (shloka == null) {
+                return Text(
+                  'Daily shloka is unavailable offline until it has been cached.',
+                  style: GoogleFonts.lato(color: AppColors.warmGrey),
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    shloka.sanskrit,
+                    style: GoogleFonts.tiroDevanagariSanskrit(
+                      fontSize: 18,
+                      color: AppColors.darkBrown,
+                      height: 1.8,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 1,
+                    color: AppColors.gold.withValues(alpha: 0.4),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    shloka.english,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 15,
+                      color: AppColors.warmGrey,
+                      fontStyle: FontStyle.italic,
+                      height: 1.7,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
 
           const SizedBox(height: 16),
           Align(

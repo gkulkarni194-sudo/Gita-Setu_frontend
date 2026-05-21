@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../local/cache_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
 import '../../constants/app_constants.dart';
@@ -10,6 +12,12 @@ class ChapterListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cachedChapters = CacheLocalService(
+      Hive.box<dynamic>(CacheLocalService.boxName),
+    ).getChapterMetadata();
+    final chapters =
+        cachedChapters.isEmpty ? AppConstants.chapters : cachedChapters;
+
     return Scaffold(
       body: FlowerBackground(
         child: SafeArea(
@@ -51,9 +59,9 @@ class ChapterListScreen extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: AppConstants.chapters.length,
+                  itemCount: chapters.length,
                   itemBuilder: (context, index) {
-                    final chapter = AppConstants.chapters[index];
+                    final chapter = chapters[index];
                     return _buildChapterCard(context, chapter);
                   },
                 ),
@@ -65,13 +73,17 @@ class ChapterListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChapterCard(BuildContext context, Map<String, String> chapter) {
+  Widget _buildChapterCard(BuildContext context, Map<dynamic, dynamic> chapter) {
+    final chapterNum = chapter['num'].toString();
+    final chapterName = chapter['name']?.toString() ?? '';
+    final sanskrit = chapter['sanskrit']?.toString() ?? '';
+    final verses = chapter['verses']?.toString() ?? '';
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) =>
-              ChapterDetailScreen(chapterNum: int.parse(chapter['num']!)),
+              ChapterDetailScreen(chapterNum: int.parse(chapterNum)),
         ),
       ),
       child: Container(
@@ -101,7 +113,7 @@ class ChapterListScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  chapter['num']!,
+                  chapterNum,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -122,7 +134,7 @@ class ChapterListScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    chapter['name']!,
+                    chapterName,
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -131,7 +143,7 @@ class ChapterListScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    chapter['sanskrit']!,
+                    sanskrit,
                     style: GoogleFonts.lato(
                       fontSize: 12,
                       color: AppColors.gold,
@@ -144,7 +156,7 @@ class ChapterListScreen extends StatelessWidget {
 
             // Verse count
             Text(
-              '${chapter['verses']} verses',
+              '$verses verses',
               style: GoogleFonts.lato(
                 fontSize: 12,
                 color: AppColors.warmGrey,

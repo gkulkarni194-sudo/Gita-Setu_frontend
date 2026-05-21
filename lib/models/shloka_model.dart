@@ -35,4 +35,16 @@ class ShlokaModel {
       purport: json['purport']?.toString() ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'chapter': chapter,
+      'verse': verse,
+      'sanskrit': sanskrit,
+      'transliteration': transliteration,
+      'english': english,
+      'purport': purport,
+    };
+  }
 }

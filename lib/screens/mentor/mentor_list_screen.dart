@@ -6,6 +6,7 @@ import '../../models/guru.dart';
 import '../../providers/app_providers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
+import 'mentor_profile_screen.dart';
 
 class MentorListScreen extends ConsumerStatefulWidget {
   const MentorListScreen({super.key});
@@ -64,7 +65,7 @@ class _MentorListScreenState extends ConsumerState<MentorListScreen> {
                 ),
               ),
               Expanded(
-                child: gurusAsync.when(
+                child: mentorsAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (err, __) => Center(

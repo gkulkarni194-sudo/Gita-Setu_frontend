@@ -27,6 +27,7 @@ class _MoodInputScreenState extends ConsumerState<MoodInputScreen> {
   ];
 
   Future<void> _submit() async {
+    if (_loading) return;
     if (_controller.text.trim().isEmpty) return;
 
     setState(() => _loading = true);

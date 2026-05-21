@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../constants/app_constants.dart';
+import '../../local/cache_local_service.dart';
 import '../../local/progress_local_service.dart';
 import '../../providers/app_providers.dart';
 import '../../theme/app_theme.dart';
@@ -226,8 +227,12 @@ class _ChapterSummaryAudioPlayerState extends State<ChapterSummaryAudioPlayer> {
 
   String _chapterAudioUrl(int chapterNum) {
     final baseUrl = AppConstants.baseUrl.replaceFirst(RegExp(r'/+$'), '');
-    final track = chapterNum.toString().padLeft(2, '0');
-    return '$baseUrl/static/audio/$track-Track$track.mp3';
+    final mappings = CacheLocalService(
+      Hive.box<dynamic>(CacheLocalService.boxName),
+    ).getAudioMappings();
+    final fileName = mappings['$chapterNum'] ??
+        '${chapterNum.toString().padLeft(2, '0')}-Track${chapterNum.toString().padLeft(2, '0')}.mp3';
+    return '$baseUrl/static/audio/$fileName';
   }
 
   Future<void> _loadAudio() async {

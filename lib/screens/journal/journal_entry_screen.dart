@@ -85,6 +85,7 @@ class _JournalEntryScreenState extends ConsumerState<JournalEntryScreen> {
   }
 
   Future<void> _saveAndAnalyze() async {
+    if (_saving || _analyzing) return;
     final saved = await _save();
     if (saved == null) return;
 

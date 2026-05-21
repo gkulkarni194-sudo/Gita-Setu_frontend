@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'local/cache_local_service.dart';
 import 'local/journal_local_service.dart';
 import 'local/profile_local_service.dart';
 import 'local/progress_local_service.dart';
@@ -18,6 +19,8 @@ Future<void> main() async {
   await Hive.openBox<JournalEntry>(JournalLocalService.boxName);
   await Hive.openBox<dynamic>(ProfileLocalService.boxName);
   await Hive.openBox<dynamic>(ProgressLocalService.boxName);
+  final cacheBox = await Hive.openBox<dynamic>(CacheLocalService.boxName);
+  await CacheLocalService(cacheBox).persistStaticData();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const ProviderScope(child: GitaSetuApp()));
 }

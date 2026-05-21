@@ -12,6 +12,7 @@ class JournalRepository {
 
   final JournalLocalService _localService;
   final ApiService _apiService;
+  final Map<String, Future<ApiResponse<dynamic>>> _reflectionCache = {};
 
   List<JournalEntry> entries({String query = ''}) {
     return query.trim().isEmpty
@@ -51,6 +52,20 @@ class JournalRepository {
   Future<void> clear() => _localService.clear();
 
   Future<ApiResponse<dynamic>> requestAiReflection(String content) {
-    return _apiService.analyzeJournal({'content': content});
+    final normalized = content.trim();
+    return _cachedReflection(normalized);
+  }
+
+  Future<ApiResponse<dynamic>> _cachedReflection(String content) async {
+    final cached = _reflectionCache[content];
+    if (cached != null) return cached;
+
+    final future = _apiService.analyzeJournal({'content': content});
+    _reflectionCache[content] = future;
+    final response = await future;
+    if (!response.success) {
+      _reflectionCache.remove(content);
+    }
+    return response;
   }
 }

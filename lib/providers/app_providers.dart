@@ -5,7 +5,6 @@ import '../repositories/gita_repository.dart';
 import '../repositories/guru_repository.dart';
 import '../repositories/api_service.dart';
 export 'admin_provider.dart';
-export 'chat_provider.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 

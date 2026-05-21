@@ -105,11 +105,23 @@ class _JournalEntryScreenState extends ConsumerState<JournalEntryScreen> {
         return;
       }
 
+      final data = response.data;
+      if (data is! Map) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('The journal reflection was unreadable.'),
+            action: SnackBarAction(label: 'Retry', onPressed: _saveAndAnalyze),
+          ),
+        );
+        return;
+      }
+
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => JournalAnalysisScreen(
-              result: response.data as Map<String, dynamic>),
+            result: Map<String, dynamic>.from(data),
+          ),
         ),
       );
     } catch (error) {

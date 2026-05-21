@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:video_player/video_player.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../local/profile_local_service.dart';
+import '../onboarding/disclaimer_screen.dart';
+import '../onboarding/profile_creation_screen.dart';
 import '../onboarding/terms_screen.dart';
 import '../home/home_screen.dart';
 
@@ -15,6 +18,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   late VideoPlayerController _controller;
   bool _videoInitialized = false;
+  bool _hasNavigated = false;
 
   @override
   void initState() {
@@ -44,15 +48,24 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigate() async {
+    if (_hasNavigated) return;
+    _hasNavigated = true;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    final profileService = ProfileLocalService(
+      Hive.box<dynamic>(ProfileLocalService.boxName),
+    );
+    final nextScreen = profileService.hasProfile
+        ? const MainScreen()
+        : profileService.disclaimerAccepted
+            ? profileService.termsAccepted
+                ? const ProfileCreationScreen()
+                : const TermsScreen()
+            : const DisclaimerScreen();
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) =>
-        hasSeenOnboarding ? MainScreen() : const TermsScreen(),
+        pageBuilder: (_, __, ___) => nextScreen,
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
         transitionDuration: const Duration(milliseconds: 800),

@@ -9,7 +9,9 @@ class GitaRepository {
   Future<ShlokaModel?> getDailyShloka() async {
     final response = await _apiService.getDailyShloka();
     if (!response.success || response.data == null) return null;
-    final map = response.data is Map ? (response.data['shloka'] ?? response.data) : response.data;
+    final data = response.data;
+    final map = data is Map ? (data['shloka'] ?? data) : data;
+    if (map is! Map) return null;
     try {
       return ShlokaModel.fromJson(Map<String, dynamic>.from(map));
     } catch (_) {
@@ -22,8 +24,12 @@ class GitaRepository {
     if (!response.success || response.data == null) return [];
     
     final data = response.data;
-    final list = data is Map ? (data['shlokas'] ?? data['data'] ?? []) as List : data as List;
+    final rawList = data is Map ? (data['shlokas'] ?? data['data']) : data;
+    if (rawList is! List) return [];
     
-    return list.map((s) => ShlokaModel.fromJson(Map<String, dynamic>.from(s))).toList();
+    return rawList
+        .whereType<Map>()
+        .map((s) => ShlokaModel.fromJson(Map<String, dynamic>.from(s)))
+        .toList();
   }
 }

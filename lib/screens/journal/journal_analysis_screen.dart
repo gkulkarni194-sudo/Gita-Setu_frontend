@@ -16,7 +16,14 @@ class JournalAnalysisScreen extends StatelessWidget {
     final suggested = result['suggestedShlokas'];
     final shlokas = (suggested is List ? suggested : const <dynamic>[])
         .whereType<Map>()
-        .map((s) => ShlokaModel.fromJson(Map<String, dynamic>.from(s)))
+        .map((s) {
+          try {
+            return ShlokaModel.fromJson(Map<String, dynamic>.from(s));
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<ShlokaModel>()
         .toList();
 
     return Scaffold(

@@ -13,10 +13,9 @@ class GuruRepository {
     final List<dynamic> items;
     if (data is List) {
       items = data;
-    } else if (data is Map && data['gurus'] is List) {
-      items = data['gurus'] as List;
-    } else if (data is Map && data['mentors'] is List) {
-      items = data['mentors'] as List;
+    } else if (data is Map) {
+      final rawItems = data['gurus'] ?? data['mentors'];
+      items = rawItems is List ? rawItems : const <dynamic>[];
     } else {
       items = const <dynamic>[];
     }

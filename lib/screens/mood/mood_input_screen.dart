@@ -47,10 +47,23 @@ class _MoodInputScreenState extends ConsumerState<MoodInputScreen> {
           return;
         }
 
+        final data = response.data;
+        if (data is! Map) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('The mood response was unreadable.'),
+              action: SnackBarAction(label: 'Retry', onPressed: _submit),
+            ),
+          );
+          return;
+        }
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => MoodResponseScreen(result: response.data as Map<String, dynamic>),
+            builder: (_) => MoodResponseScreen(
+              result: Map<String, dynamic>.from(data),
+            ),
           ),
         );
       }

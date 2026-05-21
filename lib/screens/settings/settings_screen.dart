@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../local/profile_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
-import '../auth/login_screen.dart';
+import '../profile/profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,7 +18,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notifications = true;
   bool _dailyShloka = true;
   bool _soundEnabled = true;
-  String _name = 'Kritika';
 
   final List<Map<String, dynamic>> _themes = [
     {
@@ -38,7 +39,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ];
 
   void _editName() {
-    final ctrl = TextEditingController(text: _name);
+    final service = ProfileLocalService(
+      Hive.box<dynamic>(ProfileLocalService.boxName),
+    );
+    final ctrl = TextEditingController(text: service.getProfile()?.name ?? '');
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -63,50 +67,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: GoogleFonts.lato(color: AppColors.warmGrey)),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() => _name = ctrl.text);
+            onPressed: () async {
+              await service.updateName(ctrl.text);
+              if (mounted) setState(() {});
+              if (!mounted) return;
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
             ),
             child: Text('Save', style: GoogleFonts.lato(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _resetPassword() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Reset Password',
-            style: GoogleFonts.playfairDisplay(
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkBrown,
-            )),
-        content: Text(
-            'A password reset link will be sent to your email address.',
-            style: GoogleFonts.lato(color: AppColors.warmGrey)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel',
-                style: GoogleFonts.lato(color: AppColors.warmGrey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Reset link sent to your email!')),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-            ),
-            child:
-                Text('Send Link', style: GoogleFonts.lato(color: Colors.white)),
           ),
         ],
       ),
@@ -136,15 +106,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _openAdminLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final profileService = ProfileLocalService(
+      Hive.box<dynamic>(ProfileLocalService.boxName),
+    );
+    final profile = profileService.getProfile();
+    final name = profile?.name ?? 'Seeker';
+
     return Scaffold(
       body: FlowerBackground(
         child: SafeArea(
@@ -172,15 +141,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Profile section
                 _buildSectionTitle('👤 Profile'),
                 _buildCard(children: [
-                  _buildRow('Name', _name,
+                  _buildRow('Name', name,
                       onTap: _editName,
                       trailing: const Icon(Icons.edit,
                           size: 16, color: AppColors.primary)),
                   _buildDivider(),
-                  _buildRow('Email', 'kritika@email.com'),
-                  _buildDivider(),
-                  _buildRow('Reset Password', '',
-                      onTap: _resetPassword,
+                  _buildRow('Profile & Progress', '',
+                      onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ProfileScreen(),
+                            ),
+                          ),
                       trailing: const Icon(Icons.arrow_forward_ios,
                           size: 14, color: AppColors.warmGrey)),
                 ]),
@@ -293,15 +265,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ]),
                 const SizedBox(height: 20),
 
-                // Danger zone
-                _buildSectionTitle('Admin'),
+                _buildSectionTitle('Local Data'),
                 _buildCard(children: [
-                  _buildRow('Admin Dashboard Access', '',
-                      textColor: AppColors.primary,
-                      onTap: _openAdminLogin,
-                      trailing: const Icon(Icons.admin_panel_settings,
-                          size: 16, color: AppColors.primary)),
-                  _buildDivider(),
                   _buildRow('Local Data Info', '',
                       textColor: Colors.red,
                       onTap: _deleteAccount,

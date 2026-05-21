@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../local/profile_local_service.dart';
+import '../../local/progress_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
 import '../../models/shloka_model.dart';
@@ -41,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.gold.withOpacity(0.1),
+              color: AppColors.gold.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -106,18 +109,30 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final profileBox = Hive.box<dynamic>(ProfileLocalService.boxName);
+    final progressBox = Hive.box<dynamic>(ProgressLocalService.boxName);
+
     return FlowerBackground(
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
+        child: AnimatedBuilder(
+          animation: Listenable.merge([
+            profileBox.listenable(),
+            progressBox.listenable(),
+          ]),
+          builder: (context, _) {
+            final profile = ProfileLocalService(profileBox).getProfile();
+            final progress = ProgressLocalService(progressBox).getProgress();
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
 
               // Greeting
               Text(
-                'Namaste 🪷',
+                'Namaste, ${profile?.name ?? 'Seeker'}',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -132,7 +147,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   const Text('🔥', style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 4),
                   Text(
-                    '7 Day Streak',
+                    '${progress.currentStreak} Day Streak',
                     style: GoogleFonts.lato(
                       fontSize: 14,
                       color: AppColors.primary,
@@ -192,7 +207,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 fullWidth: true,
               ),
             ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -204,10 +221,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       decoration: BoxDecoration(
         color: AppColors.saffronLight,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.gold.withOpacity(0.5), width: 1),
+        border: Border.all(
+          color: AppColors.gold.withValues(alpha: 0.5),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.gold.withOpacity(0.15),
+            color: AppColors.gold.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -220,7 +240,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -255,7 +275,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(height: 12),
             Container(
               height: 1,
-              color: AppColors.gold.withOpacity(0.4),
+              color: AppColors.gold.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 12),
             Text(
@@ -303,7 +323,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
             BoxShadow(
-              color: AppColors.gold.withOpacity(0.08),
+              color: AppColors.gold.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

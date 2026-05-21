@@ -56,10 +56,18 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         return;
       }
       
-      final content = (response.data['answer'] ?? '').toString();
+      final data = response.data;
+      final content = data is Map
+          ? (data['answer'] ?? data['explanation'] ?? '').toString()
+          : data.toString();
 
       setState(() {
-        _messages.add({'role': 'ai', 'content': content});
+        _messages.add({
+          'role': 'ai',
+          'content': content.isEmpty
+              ? 'I could not read the server response. Please try again.'
+              : content,
+        });
         _history.add({'question': question, 'answer': content});
         _lastFailedQuestion = null;
         _loading = false;

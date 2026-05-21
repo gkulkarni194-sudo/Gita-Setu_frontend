@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../local/profile_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
-import '../home/home_screen.dart';
+import 'terms_screen.dart';
 
 class DisclaimerScreen extends StatelessWidget {
   const DisclaimerScreen({super.key});
 
   Future<void> _continue(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasSeenOnboarding', true);
+    final profileService = ProfileLocalService(
+      Hive.box<dynamic>(ProfileLocalService.boxName),
+    );
+    await profileService.acceptDisclaimer();
     if (!context.mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
+      MaterialPageRoute(builder: (_) => const TermsScreen()),
     );
   }
 

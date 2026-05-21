@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../local/profile_local_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
-import 'disclaimer_screen.dart';
+import 'profile_creation_screen.dart';
 
 class TermsScreen extends StatefulWidget {
   const TermsScreen({super.key});
@@ -14,6 +16,18 @@ class TermsScreen extends StatefulWidget {
 class _TermsScreenState extends State<TermsScreen> {
   bool _accepted = false;
   final ScrollController _scrollController = ScrollController();
+
+  Future<void> _continue() async {
+    final profileService = ProfileLocalService(
+      Hive.box<dynamic>(ProfileLocalService.boxName),
+    );
+    await profileService.acceptTerms();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ProfileCreationScreen()),
+    );
+  }
 
   @override
   void dispose() {
@@ -152,11 +166,7 @@ class _TermsScreenState extends State<TermsScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _accepted
-                          ? () => Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const DisclaimerScreen()),
-                              )
+                          ? _continue
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

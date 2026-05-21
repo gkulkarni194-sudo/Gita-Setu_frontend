@@ -18,9 +18,15 @@ class ApiResponse<T> {
         data: fromJsonT != null && json['data'] != null ? fromJsonT(json['data']) : json['data'] as T?,
       );
     } else {
+      final rawError = json['error'];
       return ApiResponse<T>(
         success: false,
-        error: json['error'] != null ? ApiError.fromJson(json['error']) : ApiError(code: 'unknown', message: 'No error provided'),
+        error: rawError is Map
+            ? ApiError.fromJson(Map<String, dynamic>.from(rawError))
+            : ApiError(
+                code: 'unknown',
+                message: rawError?.toString() ?? 'No error provided',
+              ),
       );
     }
   }

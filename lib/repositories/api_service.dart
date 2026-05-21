@@ -11,8 +11,6 @@ class ApiService {
   ApiService({http.Client? client}) : _client = client ?? http.Client();
 
   final http.Client _client;
-  static const int _timeoutSeconds = 15;
-
   Future<ApiResponse<dynamic>> getHealth() async {
     return _get('/health');
   }
@@ -68,7 +66,7 @@ class ApiService {
 
   Future<ApiResponse<dynamic>> _send(Future<http.Response> Function() request) async {
     try {
-      final response = await request().timeout(const Duration(seconds: _timeoutSeconds));
+      final response = await request().timeout(AppConstants.requestTimeout);
       return _parseResponse(response);
     } on TimeoutException {
       return ApiResponse.error('timeout', 'The server is taking longer than expected. Please try again.');
@@ -90,18 +88,20 @@ class ApiService {
          return ApiResponse.error('http_error', 'Request failed with status ${response.statusCode}');
       }
       
-      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      final decoded = jsonDecode(response.body);
       
-      // Some traditional backends might not wrap the entire thing in success/data envelope if it failed with HTTP code 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-          if (decoded.containsKey('error') && decoded['error'] is Map) {
-             return ApiResponse.error(decoded['error']['code']?.toString() ?? 'unknown', decoded['error']['message']?.toString() ?? 'Error');
+          if (decoded is Map && decoded['error'] is Map) {
+             final error = decoded['error'] as Map;
+             return ApiResponse.error(error['code']?.toString() ?? 'unknown', error['message']?.toString() ?? 'Error');
           }
           return ApiResponse.error('http_error', 'HTTP ${response.statusCode}');
       }
 
-      // Automatically map traditional fastapi 'success' boolean envelope if exists.
-      // If it doesn't exist, we force it manually to preserve compatibility.
+      if (decoded is! Map<String, dynamic>) {
+         return ApiResponse(success: true, data: decoded);
+      }
+
       if (!decoded.containsKey('success')) {
          return ApiResponse(success: true, data: decoded);
       }

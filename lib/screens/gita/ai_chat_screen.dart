@@ -7,9 +7,9 @@ import '../../models/shloka_model.dart';
 import '../../providers/app_providers.dart';
 
 class AiChatScreen extends ConsumerStatefulWidget {
-  final ShlokaModel shloka;
+  final ShlokaModel? shloka; // 👈 1. Added the question mark
 
-  const AiChatScreen({super.key, required this.shloka});
+  const AiChatScreen({super.key, this.shloka}); // 👈 2. Removed the word 'required'
 
   @override
   ConsumerState<AiChatScreen> createState() => _AiChatScreenState();
@@ -38,8 +38,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
 
     try {
       final response = await ref.read(aiRepositoryProvider).explainShloka(
-            chapter: widget.shloka.chapter,
-            verse: widget.shloka.verse,
+            chapter: widget.shloka?.chapter,
+            verse: widget.shloka?.verse,
             question: question,
             history: List<Map<String, String>>.from(_history),
           );
@@ -49,14 +49,15 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           _lastFailedQuestion = question;
           _messages.add({
             'role': 'ai',
-            'content': response.error?.message ?? 'I could not reach the server. Please try again.',
+            'content': response.error?.message ??
+                'I could not reach the server. Please try again.',
           });
           _loading = false;
         });
         _scrollToBottom();
         return;
       }
-      
+
       final data = response.data;
       final content = data is Map
           ? (data['answer'] ?? data['explanation'] ?? '').toString()
@@ -150,7 +151,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                           ],
                         ),
                         Text(
-                          'BG ${widget.shloka.chapter}.${widget.shloka.verse}',
+                          widget.shloka != null
+                              ? 'Ask about Chapter ${widget.shloka!.chapter}, Verse ${widget.shloka!.verse}'
+                              : 'Ask Krishna anything...',
                           style: GoogleFonts.lato(
                             fontSize: 12,
                             color: AppColors.primary,
@@ -162,31 +165,54 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 ),
               ),
 
-              // Shloka preview
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.saffronLight,
-                    borderRadius: BorderRadius.circular(12),
-                    border: const Border(
-                      left: BorderSide(color: AppColors.primary, width: 3),
+              // Shloka preview — fully expanded, no truncation
+              if (widget.shloka != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.saffronLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: const Border(
+                        left: BorderSide(color: AppColors.primary, width: 3),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    widget.shloka.english.length > 150
-                        ? '${widget.shloka.english.substring(0, 150)}...'
-                        : widget.shloka.english,
-                    style: GoogleFonts.cormorantGaramond(
-                      fontSize: 14,
-                      color: AppColors.darkBrown,
-                      fontStyle: FontStyle.italic,
-                      height: 1.6,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.shloka!.sanskrit ?? '',
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: GoogleFonts.tiroDevanagariSanskrit(
+                            fontSize: 16,
+                            color: AppColors.darkBrown,
+                            height: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          height: 1,
+                          color: AppColors.gold.withValues(alpha: 0.4),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          widget.shloka!.english,
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: GoogleFonts.cormorantGaramond(
+                            fontSize: 14,
+                            color: AppColors.darkBrown,
+                            fontStyle: FontStyle.italic,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
               const SizedBox(height: 16),
 
               // Messages
@@ -196,13 +222,12 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   itemCount: _messages.length +
                       (_loading ? 1 : 0) +
-                      (_lastFailedQuestion != null ? 1 : 0),
+                      (_lastFailedQuestion != null && !_loading ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == _messages.length) {
-                      if (_loading) {
-                        return _buildLoadingBubble();
-                      }
-                      return _buildRetryButton();
+                      return _loading
+                          ? _buildLoadingBubble()
+                          : _buildRetryButton();
                     }
                     if (index > _messages.length) {
                       return _buildLoadingBubble();
@@ -226,13 +251,16 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(28),
-                          border: Border.all(color: AppColors.border, width: 1),
+                          border:
+                              Border.all(color: AppColors.border, width: 1),
                         ),
                         child: TextField(
                           controller: _controller,
                           onSubmitted: (_) => _sendMessage(),
                           decoration: InputDecoration(
-                            hintText: 'Ask anything about this verse...',
+                            hintText: widget.shloka != null
+                                ? 'Ask about Chapter ${widget.shloka!.chapter}, Verse ${widget.shloka!.verse}...'
+                                : 'Ask Krishna anything...',
                             hintStyle: GoogleFonts.lato(
                               color: AppColors.warmGrey,
                               fontSize: 14,
@@ -287,10 +315,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             bottomLeft: Radius.circular(isUser ? 18 : 4),
             bottomRight: Radius.circular(isUser ? 4 : 18),
           ),
-          border: isUser ? null : Border.all(color: AppColors.border, width: 1),
+          border:
+              isUser ? null : Border.all(color: AppColors.border, width: 1),
         ),
         child: Text(
           text,
+          softWrap: true,
+          overflow: TextOverflow.visible,
           style: GoogleFonts.lato(
             fontSize: 14,
             color: isUser ? Colors.white : AppColors.darkBrown,

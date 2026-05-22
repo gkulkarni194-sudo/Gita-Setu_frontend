@@ -34,8 +34,12 @@ class MentorProfileScreen extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      guru.emoji.isEmpty ? (guru.name.isEmpty ? '?' : guru.name.substring(0, 1)) : guru.emoji,
-                      style: const TextStyle(fontSize: 40),
+                      guru.name.isNotEmpty ? guru.name[0].toUpperCase() : '?',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.darkBrown,
+                      ),
                     ),
                   ),
                 ),
@@ -43,9 +47,11 @@ class MentorProfileScreen extends StatelessWidget {
                 Text(guru.name, style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.darkBrown)),
                 Text(guru.title, style: GoogleFonts.lato(fontSize: 16, color: AppColors.gold, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 16),
-                _buildInfoBadge('⭐', 'Rating', '${guru.rating}'),
-                const SizedBox(height: 8),
                 _buildInfoBadge('🎯', 'Specializations', guru.specializations.join(', ')),
+                if (guru.contact.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  _buildInfoBadge('📞', 'Contact', guru.contact),
+                ],
 
               ],
             ),

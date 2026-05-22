@@ -60,7 +60,7 @@ class JournalRepository {
     final cached = _reflectionCache[content];
     if (cached != null) return cached;
 
-    final future = _apiService.analyzeJournal({'content': content});
+    final future = _apiService.analyzeJournal({'journal_text': content});
     _reflectionCache[content] = future;
     final response = await future;
     if (!response.success) {

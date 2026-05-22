@@ -1,3 +1,5 @@
+// lib/screens/gita/chapter_detail_screen.dart
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
 import '../../widgets/shloka_card.dart';
 import 'ai_chat_screen.dart';
+import 'shloka_detail_screen.dart';
 
 class ChapterDetailScreen extends ConsumerStatefulWidget {
   final int chapterNum;
@@ -40,6 +43,14 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
     final shlokas = ref.watch(chapterShlokasProvider(chapterNum));
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AiChatScreen()),
+        ),
+        backgroundColor: AppColors.primary,
+        child: const Text('🪷', style: TextStyle(fontSize: 20)),
+      ),
       body: FlowerBackground(
         child: SafeArea(
           child: Column(
@@ -170,6 +181,12 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
                         final shloka = items[index];
                         return ShlokaCard(
                           shloka: shloka,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ShlokaDetailScreen(shloka: shloka),
+                            ),
+                          ),
                           onAskKrishna: () => Navigator.push(
                             context,
                             MaterialPageRoute(

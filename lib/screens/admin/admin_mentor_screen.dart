@@ -19,7 +19,10 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
     final isNew = mentor == null;
     final nameCtrl = TextEditingController(text: mentor?.name ?? '');
     final titleCtrl = TextEditingController(text: mentor?.title ?? '');
-    final specsCtrl = TextEditingController(text: mentor?.specializations.join(', ') ?? '');
+    final specsCtrl = TextEditingController(
+      text: mentor?.specializations.join(', ') ?? '',
+    );
+    final contactCtrl = TextEditingController(text: mentor?.contact ?? '');
 
     bool isAvailable = mentor?.available ?? true;
 
@@ -48,12 +51,14 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(isNew ? 'Add Guru' : 'Edit Guru',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.darkBrown,
-                          )),
+                      Text(
+                        isNew ? 'Add Guru' : 'Edit Guru',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.darkBrown,
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: const Icon(Icons.close, color: AppColors.warmGrey),
@@ -66,20 +71,25 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                   _buildEditField('Title', titleCtrl),
                   const SizedBox(height: 12),
                   _buildEditField('Specializations (comma separated)', specsCtrl),
+                  const SizedBox(height: 12),
+                  _buildEditField('Contact (email / phone)', contactCtrl),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Currently Available',
-                          style: GoogleFonts.lato(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.darkBrown,
-                          )),
+                      Text(
+                        'Currently Available',
+                        style: GoogleFonts.lato(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.darkBrown,
+                        ),
+                      ),
                       Switch(
                         value: isAvailable,
                         activeThumbColor: AppColors.primary,
-                        onChanged: (val) => setModalState(() => isAvailable = val),
+                        onChanged: (val) =>
+                            setModalState(() => isAvailable = val),
                       ),
                     ],
                   ),
@@ -87,36 +97,52 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: isSaving ? null : () async {
-                        setModalState(() => isSaving = true);
-                        try {
-                          final updatedGuru = Guru(
-                            id: mentor?.id ?? '', // id empty for new
-                            name: nameCtrl.text.trim(),
-                            title: titleCtrl.text.trim(),
-                            specializations: specsCtrl.text.split(',').map((s) => s.trim()).toList(),
-                            rating: mentor?.rating ?? 5.0,
-
-                            emoji: mentor?.emoji ?? '🪷',
-                            available: isAvailable,
-
-                          );
-                          await ref.read(guruRepositoryProvider).addGuru(updatedGuru);
-                          ref.invalidate(gurusProvider);
-                          if (mounted) {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(isNew ? 'Guru added!' : 'Guru updated successfully!')),
-                            );
-                          }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to save guru: $e')),
-                          );
-                        } finally {
-                          setModalState(() => isSaving = false);
-                        }
-                      },
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setModalState(() => isSaving = true);
+                              try {
+                                final updatedGuru = Guru(
+                                  id: mentor?.id ?? '',
+                                  name: nameCtrl.text.trim(),
+                                  title: titleCtrl.text.trim(),
+                                  specializations: specsCtrl.text
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .where((s) => s.isNotEmpty)
+                                      .toList(),
+                                  available: isAvailable,
+                                  contact: contactCtrl.text.trim(),
+                                );
+                                // admin_key is the password the admin typed at
+                                // login — read from state, never hardcoded here.
+                                final adminKey = ref.read(adminPasswordProvider);
+                                await ref
+                                    .read(guruRepositoryProvider)
+                                    .addGuru(updatedGuru, adminKey: adminKey);
+                                ref.invalidate(gurusProvider);
+                                if (mounted) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        isNew
+                                            ? 'Guru added!'
+                                            : 'Guru updated successfully!',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to save guru: $e'),
+                                  ),
+                                );
+                              } finally {
+                                setModalState(() => isSaving = false);
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -126,12 +152,21 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                         ),
                       ),
                       child: isSaving
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : Text('Save Changes',
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'Save Changes',
                               style: GoogleFonts.lato(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                              )),
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -147,13 +182,15 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: GoogleFonts.lato(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.warmGrey,
-              letterSpacing: 0.5,
-            )),
+        Text(
+          label,
+          style: GoogleFonts.lato(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColors.warmGrey,
+            letterSpacing: 0.5,
+          ),
+        ),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
@@ -165,7 +202,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
             controller: controller,
             decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
             style: GoogleFonts.lato(fontSize: 14, color: AppColors.darkBrown),
           ),
@@ -189,16 +227,19 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Manage Gurus',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.darkBrown,
-                          )),
+                      Text(
+                        'Manage Gurus',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.darkBrown,
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () => _editMentor(null),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: AppColors.primary,
                             borderRadius: BorderRadius.circular(20),
@@ -207,12 +248,14 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                             children: [
                               const Icon(Icons.add, color: Colors.white, size: 16),
                               const SizedBox(width: 4),
-                              Text('Add',
-                                  style: GoogleFonts.lato(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  )),
+                              Text(
+                                'Add',
+                                style: GoogleFonts.lato(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -222,28 +265,42 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                 ),
                 Expanded(
                   child: gurusAsync.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (err, _) => Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Failed to load gurus', style: GoogleFonts.lato(color: AppColors.warmGrey)),
+                          Text(
+                            'Failed to load gurus',
+                            style:
+                                GoogleFonts.lato(color: AppColors.warmGrey),
+                          ),
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
                             onPressed: () => ref.invalidate(gurusProvider),
                             icon: const Icon(Icons.refresh, size: 16),
                             label: const Text('Retry'),
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     data: (gurus) {
                       if (gurus.isEmpty) {
-                        return Center(child: Text('No gurus found in database.', style: GoogleFonts.lato(color: AppColors.warmGrey)));
+                        return Center(
+                          child: Text(
+                            'No gurus found in database.',
+                            style: GoogleFonts.lato(color: AppColors.warmGrey),
+                          ),
+                        );
                       }
                       return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 24),
                         itemCount: gurus.length,
                         itemBuilder: (context, index) {
                           final m = gurus[index];
@@ -259,6 +316,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                               children: [
                                 Row(
                                   children: [
+                                    // Avatar: first letter of name
                                     Container(
                                       width: 52,
                                       height: 52,
@@ -267,67 +325,94 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
-                                          child: Text(m.emoji.isEmpty ? (m.name.isEmpty?'?':m.name.substring(0,1)) : m.emoji,
-                                              style: const TextStyle(fontSize: 26))),
+                                        child: Text(
+                                          m.name.isNotEmpty
+                                              ? m.name[0].toUpperCase()
+                                              : '?',
+                                          style: GoogleFonts.playfairDisplay(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.darkBrown,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(m.name,
-                                              style: GoogleFonts.playfairDisplay(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.darkBrown,
-                                              )),
-                                          Text(m.title,
-                                              style: GoogleFonts.lato(
-                                                fontSize: 12,
-                                                color: AppColors.gold,
-                                                fontStyle: FontStyle.italic,
-                                              )),
+                                          Text(
+                                            m.name,
+                                            style:
+                                                GoogleFonts.playfairDisplay(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.darkBrown,
+                                            ),
+                                          ),
+                                          Text(
+                                            m.title,
+                                            style: GoogleFonts.lato(
+                                              fontSize: 12,
+                                              color: AppColors.gold,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    // Available badge
+                                    // Availability badge
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: m.available ? Colors.green.shade50 : Colors.red.shade50,
-                                        borderRadius: BorderRadius.circular(20),
+                                        color: m.available
+                                            ? Colors.green.shade50
+                                            : Colors.red.shade50,
+                                        borderRadius:
+                                            BorderRadius.circular(20),
                                         border: Border.all(
-                                          color: m.available ? Colors.green : Colors.red,
+                                          color: m.available
+                                              ? Colors.green
+                                              : Colors.red,
                                         ),
                                       ),
                                       child: Text(
                                         m.available ? 'Active' : 'Inactive',
                                         style: GoogleFonts.lato(
                                           fontSize: 11,
-                                          color: m.available ? Colors.green.shade700 : Colors.red.shade700,
+                                          color: m.available
+                                              ? Colors.green.shade700
+                                              : Colors.red.shade700,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.background,
-                                    borderRadius: BorderRadius.circular(10),
+                                if (m.specializations.isNotEmpty || m.contact.isNotEmpty) ...[
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.background,
+                                      borderRadius:
+                                          BorderRadius.circular(10),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        if (m.specializations.isNotEmpty)
+                                          _buildInfoRow('🎯', 'Specs:', m.specializations.join(', ')),
+                                        if (m.contact.isNotEmpty)
+                                          _buildInfoRow('📞', 'Contact:', m.contact),
+                                      ],
+                                    ),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildInfoRow('🎯', 'Specs:', m.specializations.join(', ')),
-
-                                      _buildInfoRow('⭐', 'Rating:', '${m.rating}'),
-                                    ],
-                                  ),
-                                ),
+                                ],
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
@@ -338,21 +423,30 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         label: const Text('Edit'),
                                         style: OutlinedButton.styleFrom(
                                           foregroundColor: AppColors.primary,
-                                          side: const BorderSide(color: AppColors.primary),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          side: const BorderSide(
+                                              color: AppColors.primary),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: OutlinedButton.icon(
-                                        onPressed: () => ref.invalidate(gurusProvider),
-                                        icon: const Icon(Icons.delete_outline, size: 16),
+                                        onPressed: () =>
+                                            ref.invalidate(gurusProvider),
+                                        icon: const Icon(
+                                            Icons.delete_outline,
+                                            size: 16),
                                         label: const Text('Remove'),
                                         style: OutlinedButton.styleFrom(
                                           foregroundColor: Colors.red,
-                                          side: const BorderSide(color: Colors.red),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          side: const BorderSide(
+                                              color: Colors.red),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
                                         ),
                                       ),
                                     ),
@@ -380,19 +474,22 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$emoji $label ',
+          Text(
+            '$emoji $label ',
+            style: GoogleFonts.lato(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.warmGrey,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
               style: GoogleFonts.lato(
                 fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.warmGrey,
-              )),
-          Expanded(
-            child: Text(value,
-                style: GoogleFonts.lato(
-                  fontSize: 12,
-                  color: AppColors.darkBrown,
-                )
-                ),
+                color: AppColors.darkBrown,
+              ),
+            ),
           ),
         ],
       ),

@@ -194,10 +194,12 @@ class _MentorListScreenState extends ConsumerState<MentorListScreen> {
             ),
             child: Center(
               child: Text(
-                mentor.emoji.isEmpty
-                    ? (mentor.name.isEmpty ? '?' : mentor.name.substring(0, 1))
-                    : mentor.emoji,
-                style: const TextStyle(fontSize: 28),
+                mentor.name.isNotEmpty ? mentor.name[0].toUpperCase() : '?',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkBrown,
+                ),
               ),
             ),
           ),
@@ -252,49 +254,31 @@ class _MentorListScreenState extends ConsumerState<MentorListScreen> {
               ],
             ),
           ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.star, size: 14, color: AppColors.gold),
-                  Text(
-                    mentor.rating.toStringAsFixed(1),
-                    style: GoogleFonts.lato(
-                      fontSize: 13,
-                      color: AppColors.darkBrown,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MentorProfileScreen(guru: mentor),
+                ),
+              );
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MentorProfileScreen(guru: mentor),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'View',
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              child: Text(
+                'View',
+                style: GoogleFonts.lato(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),

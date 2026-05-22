@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String developmentBaseUrl = 'http://10.0.2.2:8000';
+  static const String developmentBaseUrl = 'http://127.0.0.1:8000';
   static const String productionBaseUrl =
       'https://your-render-api.onrender.com';
   static const Duration requestTimeout = Duration(seconds: 15);

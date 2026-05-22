@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gitasetu_flutter/screens/gita/ai_chat_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../local/profile_local_service.dart';
@@ -13,7 +14,7 @@ import '../mentor/mentor_list_screen.dart';
 import '../mood/mood_input_screen.dart';
 import '../journal/journal_home_screen.dart';
 import '../settings/settings_screen.dart';
-
+import '../gita/ai_chat_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
     const ChapterListScreen(),
     const MoodInputScreen(),
     const JournalHomeScreen(),
-    const SettingsScreen(),  // Replace MentorListScreen or add as 6th
+    const SettingsScreen(),
   ];
 
   @override
@@ -65,11 +66,21 @@ class _MainScreenState extends State<MainScreen> {
           unselectedLabelStyle: GoogleFonts.lato(fontSize: 11),
           elevation: 0,
           items: const [
-            BottomNavigationBarItem(icon: Text('🏠', style: TextStyle(fontSize: 22)), label: 'Home'),
-            BottomNavigationBarItem(icon: Text('📖', style: TextStyle(fontSize: 22)), label: 'Gita'),
-            BottomNavigationBarItem(icon: Text('🫀', style: TextStyle(fontSize: 22)), label: 'Mood'),
-            BottomNavigationBarItem(icon: Text('📓', style: TextStyle(fontSize: 22)), label: 'Journal'),
-            BottomNavigationBarItem(icon: Text('⚙️', style: TextStyle(fontSize: 22)), label: 'Settings'),
+            BottomNavigationBarItem(
+                icon: Text('🏠', style: TextStyle(fontSize: 22)),
+                label: 'Home'),
+            BottomNavigationBarItem(
+                icon: Text('📖', style: TextStyle(fontSize: 22)),
+                label: 'Gita'),
+            BottomNavigationBarItem(
+                icon: Text('🫀', style: TextStyle(fontSize: 22)),
+                label: 'Mood'),
+            BottomNavigationBarItem(
+                icon: Text('📓', style: TextStyle(fontSize: 22)),
+                label: 'Journal'),
+            BottomNavigationBarItem(
+                icon: Text('⚙️', style: TextStyle(fontSize: 22)),
+                label: 'Settings'),
           ],
         ),
       ),
@@ -105,99 +116,91 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             return SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-
-              // Greeting
-              Text(
-                'Namaste, ${profile?.name ?? 'Seeker'}',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkBrown,
-                ),
-              ),
-              const SizedBox(height: 4),
-
-              // Streak
-              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('🔥', style: TextStyle(fontSize: 14)),
-                  const SizedBox(width: 4),
+                  const SizedBox(height: 16),
+
                   Text(
-                    '${progress.currentStreak} Day Streak',
-                    style: GoogleFonts.lato(
-                      fontSize: 14,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                    'Namaste, ${profile?.name ?? 'Seeker'}',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBrown,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 28),
+                  const SizedBox(height: 4),
 
-              // Daily Shloka Card
-              _buildDailyShlokaCard(dailyShloka),
-              const SizedBox(height: 20),
-
-              // Quick Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildActionButton(
-                      '🫀',
-                      'How are you feeling?',
-                          () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MoodInputScreen(),
+                  Row(
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${progress.currentStreak} Day Streak',
+                        style: GoogleFonts.lato(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildActionButton(
-                      '📓',
-                      'Journal',
+                  const SizedBox(height: 28),
+
+                  _buildDailyShlokaCard(context, dailyShloka),
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildActionButton(
+                          '🫀',
+                          'How are you feeling?',
                           () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const JournalHomeScreen(),
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const MoodInputScreen()),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildActionButton(
+                          '📓',
+                          'Journal',
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const JournalHomeScreen()),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-              // Gita Reader Button
-              _buildActionButton(
-                '📖',
-                'Gita Reader',
+                  _buildActionButton(
+                    '📖',
+                    'Gita Reader',
                     () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ChapterListScreen(),
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ChapterListScreen()),
+                    ),
+                    fullWidth: true,
                   ),
-                ),
-                fullWidth: true,
-              ),
-              const SizedBox(height: 12),
-              _buildActionButton(
-                '🧘',
-                'Contact Guru',
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MentorListScreen(),
+                  const SizedBox(height: 12),
+
+                  _buildActionButton(
+                    '🧘',
+                    'Contact Guru',
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const MentorListScreen()),
+                    ),
+                    fullWidth: true,
                   ),
-                ),
-                fullWidth: true,
-              ),
-            ],
+                ],
               ),
             );
           },
@@ -206,9 +209,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     );
   }
 
-  Widget _buildDailyShlokaCard(AsyncValue<ShlokaModel?> dailyShloka) {
+  void _navigateToChat(BuildContext context, ShlokaModel shloka) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AiChatScreen(shloka: shloka)),
+    );
+  }
+
+  Widget _buildDailyShlokaCard(
+      BuildContext context, AsyncValue<ShlokaModel?> dailyShloka) {
     return Container(
-      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.saffronLight,
         borderRadius: BorderRadius.circular(24),
@@ -224,101 +234,119 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('✨', style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
-                Text(
-                  'Shloka of the Day',
-                  style: GoogleFonts.lato(
-                    fontSize: 12,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: dailyShloka.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator()),
           ),
-          const SizedBox(height: 16),
-
-          dailyShloka.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => Text(
+          error: (_, __) => Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
               'Daily shloka is unavailable offline until it has been cached.',
               style: GoogleFonts.lato(color: AppColors.warmGrey),
             ),
-            data: (shloka) {
-              if (shloka == null) {
-                return Text(
+          ),
+          data: (shloka) {
+            if (shloka == null) {
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
                   'Daily shloka is unavailable offline until it has been cached.',
                   style: GoogleFonts.lato(color: AppColors.warmGrey),
-                );
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    shloka.sanskrit,
-                    style: GoogleFonts.tiroDevanagariSanskrit(
-                      fontSize: 18,
-                      color: AppColors.darkBrown,
-                      height: 1.8,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 1,
-                    color: AppColors.gold.withValues(alpha: 0.4),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    shloka.english,
-                    style: GoogleFonts.cormorantGaramond(
-                      fontSize: 15,
-                      color: AppColors.warmGrey,
-                      fontStyle: FontStyle.italic,
-                      height: 1.7,
-                    ),
-                  ),
-                ],
+                ),
               );
-            },
-          ),
+            }
+            return InkWell(
+              onTap: () => _navigateToChat(context, shloka),
+              splashColor: AppColors.gold.withValues(alpha: 0.15),
+              highlightColor: AppColors.gold.withValues(alpha: 0.08),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('✨', style: TextStyle(fontSize: 12)),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Shloka of the Day',
+                            style: GoogleFonts.lato(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              'Read More →',
-              style: GoogleFonts.lato(
-                fontSize: 13,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
+                    Text(
+                      shloka.sanskrit,
+                      style: GoogleFonts.tiroDevanagariSanskrit(
+                        fontSize: 18,
+                        color: AppColors.darkBrown,
+                        height: 1.8,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      height: 1,
+                      color: AppColors.gold.withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      shloka.english,
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 15,
+                        color: AppColors.warmGrey,
+                        fontStyle: FontStyle.italic,
+                        height: 1.7,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => _navigateToChat(context, shloka),
+                        child: Text(
+                          'Read More →',
+                          style: GoogleFonts.lato(
+                            fontSize: 13,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildActionButton(
-      String emoji,
-      String label,
-      VoidCallback onTap, {
-        bool fullWidth = false,
-      }) {
+    String emoji,
+    String label,
+    VoidCallback onTap, {
+    bool fullWidth = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -338,36 +366,36 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         ),
         child: fullWidth
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: GoogleFonts.lato(
-                fontSize: 14,
-                color: AppColors.darkBrown,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        )
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(emoji, style: const TextStyle(fontSize: 22)),
+                  const SizedBox(width: 10),
+                  Text(
+                    label,
+                    style: GoogleFonts.lato(
+                      fontSize: 14,
+                      color: AppColors.darkBrown,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              )
             : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.lato(
-                fontSize: 13,
-                color: AppColors.darkBrown,
-                fontWeight: FontWeight.w500,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(emoji, style: const TextStyle(fontSize: 28)),
+                  const SizedBox(height: 8),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.lato(
+                      fontSize: 13,
+                      color: AppColors.darkBrown,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

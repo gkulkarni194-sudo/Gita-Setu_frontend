@@ -1,3 +1,4 @@
+import 'dart:convert'; // 👈 Make sure to add this import at the top
 import 'api_error.dart';
 
 class ApiResponse<T> {
@@ -28,6 +29,24 @@ class ApiResponse<T> {
                 message: rawError?.toString() ?? 'No error provided',
               ),
       );
+    }
+  }
+
+  /// 🛡️ SOLUTION 3 SAFETY NET: Parses a raw string response completely safely.
+  /// Use this method in your repositories instead of calling jsonDecode directly.
+  factory ApiResponse.fromRawBody(
+    String rawBody, 
+    T Function(dynamic)? fromJsonT
+  ) {
+    try {
+      final decoded = jsonDecode(rawBody);
+      if (decoded is Map<String, dynamic>) {
+        return ApiResponse.fromJson(decoded, fromJsonT);
+      } else {
+        return ApiResponse.error('INVALID_JSON_FORMAT', 'Server response was not a structured JSON object.');
+      }
+    } catch (e) {
+      return ApiResponse.error('CLIENT_PARSE_ERROR', 'Could not read server response. Please check your connectivity.');
     }
   }
 

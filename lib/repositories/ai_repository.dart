@@ -15,8 +15,8 @@ class AiRepository {
   }
 
   Future<ApiResponse<dynamic>> explainShloka({
-    required int chapter,
-    required int verse,
+    int? chapter,
+    int? verse,
     required String question,
     required List<Map<String, String>> history,
   }) {
@@ -24,7 +24,7 @@ class AiRepository {
     final historyKey = history
         .map((item) => '${item['question'] ?? ''}:${item['answer'] ?? ''}')
         .join('|');
-    return _cached('explain:$chapter:$verse:$normalized:$historyKey', () {
+    return _cached('explain:${chapter ?? "general"}:${verse ?? "general"}:$normalized:$historyKey', () {
       return _apiService.explainQuery({
         'chapter': chapter,
         'verse': verse,

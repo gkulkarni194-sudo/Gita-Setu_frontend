@@ -50,7 +50,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     ref.read(adminProvider.notifier).login();
-    
+    ref.read(adminPasswordProvider.notifier).state = password;
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(

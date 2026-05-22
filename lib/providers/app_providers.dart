@@ -43,5 +43,3 @@ final chapterShlokasProvider = FutureProvider.family((ref, int chapter) {
 final gurusProvider = FutureProvider((ref) {
   return ref.watch(guruRepositoryProvider).getGurus();
 });
-
-

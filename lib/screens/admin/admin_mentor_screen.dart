@@ -23,7 +23,6 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
       text: mentor?.specializations.join(', ') ?? '',
     );
     final contactCtrl = TextEditingController(text: mentor?.contact ?? '');
-
     bool isAvailable = mentor?.available ?? true;
 
     showModalBottomSheet(
@@ -111,12 +110,13 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                       .map((s) => s.trim())
                                       .where((s) => s.isNotEmpty)
                                       .toList(),
-                                  available: isAvailable,
                                   contact: contactCtrl.text.trim(),
+                                  available: isAvailable,
                                 );
-                                // admin_key is the password the admin typed at
-                                // login — read from state, never hardcoded here.
-                                final adminKey = ref.read(adminPasswordProvider);
+                                // admin_key comes from session state —
+                                // never hardcoded.
+                                final adminKey =
+                                    ref.read(adminPasswordProvider);
                                 await ref
                                     .read(guruRepositoryProvider)
                                     .addGuru(updatedGuru, adminKey: adminKey);
@@ -136,7 +136,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Failed to save guru: $e'),
+                                    content:
+                                        Text('Failed to save guru: $e'),
                                   ),
                                 );
                               } finally {
@@ -205,7 +206,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
-            style: GoogleFonts.lato(fontSize: 14, color: AppColors.darkBrown),
+            style:
+                GoogleFonts.lato(fontSize: 14, color: AppColors.darkBrown),
           ),
         ),
       ],
@@ -246,7 +248,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.add, color: Colors.white, size: 16),
+                              const Icon(Icons.add,
+                                  color: Colors.white, size: 16),
                               const SizedBox(width: 4),
                               Text(
                                 'Add',
@@ -271,11 +274,9 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Failed to load gurus',
-                            style:
-                                GoogleFonts.lato(color: AppColors.warmGrey),
-                          ),
+                          Text('Failed to load gurus',
+                              style: GoogleFonts.lato(
+                                  color: AppColors.warmGrey)),
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
                             onPressed: () => ref.invalidate(gurusProvider),
@@ -294,7 +295,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                         return Center(
                           child: Text(
                             'No gurus found in database.',
-                            style: GoogleFonts.lato(color: AppColors.warmGrey),
+                            style: GoogleFonts.lato(
+                                color: AppColors.warmGrey),
                           ),
                         );
                       }
@@ -310,7 +312,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.border),
+                              border:
+                                  Border.all(color: AppColors.border),
                             ),
                             child: Column(
                               children: [
@@ -329,7 +332,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                           m.name.isNotEmpty
                                               ? m.name[0].toUpperCase()
                                               : '?',
-                                          style: GoogleFonts.playfairDisplay(
+                                          style: GoogleFonts
+                                              .playfairDisplay(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.darkBrown,
@@ -345,8 +349,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         children: [
                                           Text(
                                             m.name,
-                                            style:
-                                                GoogleFonts.playfairDisplay(
+                                            style: GoogleFonts
+                                                .playfairDisplay(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.darkBrown,
@@ -363,10 +367,10 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         ],
                                       ),
                                     ),
-                                    // Availability badge
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 4),
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: m.available
                                             ? Colors.green.shade50
@@ -380,7 +384,9 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        m.available ? 'Active' : 'Inactive',
+                                        m.available
+                                            ? 'Active'
+                                            : 'Inactive',
                                         style: GoogleFonts.lato(
                                           fontSize: 11,
                                           color: m.available
@@ -392,7 +398,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                     ),
                                   ],
                                 ),
-                                if (m.specializations.isNotEmpty || m.contact.isNotEmpty) ...[
+                                if (m.specializations.isNotEmpty ||
+                                    m.contact.isNotEmpty) ...[
                                   const SizedBox(height: 12),
                                   Container(
                                     width: double.infinity,
@@ -403,12 +410,21 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                           BorderRadius.circular(10),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         if (m.specializations.isNotEmpty)
-                                          _buildInfoRow('🎯', 'Specs:', m.specializations.join(', ')),
+                                          _buildInfoRow(
+                                            '🎯',
+                                            'Specs:',
+                                            m.specializations.join(', '),
+                                          ),
                                         if (m.contact.isNotEmpty)
-                                          _buildInfoRow('📞', 'Contact:', m.contact),
+                                          _buildInfoRow(
+                                            '📞',
+                                            'Contact:',
+                                            m.contact,
+                                          ),
                                       ],
                                     ),
                                   ),
@@ -419,15 +435,18 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                     Expanded(
                                       child: OutlinedButton.icon(
                                         onPressed: () => _editMentor(m),
-                                        icon: const Icon(Icons.edit, size: 16),
+                                        icon: const Icon(Icons.edit,
+                                            size: 16),
                                         label: const Text('Edit'),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.primary,
+                                          foregroundColor:
+                                              AppColors.primary,
                                           side: const BorderSide(
                                               color: AppColors.primary),
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(10)),
+                                                  BorderRadius.circular(
+                                                      10)),
                                         ),
                                       ),
                                     ),
@@ -446,7 +465,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                               color: Colors.red),
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(10)),
+                                                  BorderRadius.circular(
+                                                      10)),
                                         ),
                                       ),
                                     ),

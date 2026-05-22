@@ -60,12 +60,31 @@ class JournalRepository {
     final cached = _reflectionCache[content];
     if (cached != null) return cached;
 
-    final future = _apiService.analyzeJournal({'journal_text': content});
+    final future = _apiService
+        .analyzeJournal({'input': content})
+        .then(_withSuggestedShlokasList);
     _reflectionCache[content] = future;
     final response = await future;
     if (!response.success) {
       _reflectionCache.remove(content);
     }
     return response;
+  }
+
+  ApiResponse<dynamic> _withSuggestedShlokasList(ApiResponse<dynamic> response) {
+    final data = response.data;
+    if (!response.success || data is! Map) return response;
+
+    final normalizedData = Map<String, dynamic>.from(data);
+    normalizedData['suggestedShlokas'] =
+        normalizedData['suggestedShlokas'] is List
+            ? normalizedData['suggestedShlokas']
+            : const <dynamic>[];
+
+    return ApiResponse<dynamic>(
+      success: response.success,
+      data: normalizedData,
+      error: response.error,
+    );
   }
 }

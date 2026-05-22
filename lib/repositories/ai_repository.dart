@@ -10,7 +10,9 @@ class AiRepository {
   Future<ApiResponse<dynamic>> analyzeMood(String input) {
     final normalized = input.trim();
     return _cached('mood:$normalized', () {
-      return _apiService.analyzeMood({'input': normalized});
+      return _apiService
+          .analyzeMood({'input': normalized})
+          .then(_withSuggestedShlokasList);
     });
   }
 
@@ -24,14 +26,35 @@ class AiRepository {
     final historyKey = history
         .map((item) => '${item['question'] ?? ''}:${item['answer'] ?? ''}')
         .join('|');
-    return _cached('explain:${chapter ?? "general"}:${verse ?? "general"}:$normalized:$historyKey', () {
-      return _apiService.explainQuery({
-        'chapter': chapter,
-        'verse': verse,
+    return _cached(
+        'explain:${chapter ?? "general"}:${verse ?? "general"}:$normalized:$historyKey',
+        () {
+      final payload = <String, dynamic>{
+        'input': normalized,
         'question': normalized,
         'history': history,
-      });
+      };
+      if (chapter != null) payload['chapter'] = chapter;
+      if (verse != null) payload['verse'] = verse;
+      return _apiService.explainQuery(payload);
     });
+  }
+
+  ApiResponse<dynamic> _withSuggestedShlokasList(ApiResponse<dynamic> response) {
+    final data = response.data;
+    if (!response.success || data is! Map) return response;
+
+    final normalizedData = Map<String, dynamic>.from(data);
+    normalizedData['suggestedShlokas'] =
+        normalizedData['suggestedShlokas'] is List
+            ? normalizedData['suggestedShlokas']
+            : const <dynamic>[];
+
+    return ApiResponse<dynamic>(
+      success: response.success,
+      data: normalizedData,
+      error: response.error,
+    );
   }
 
   Future<ApiResponse<dynamic>> _cached(

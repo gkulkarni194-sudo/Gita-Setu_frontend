@@ -56,7 +56,8 @@ class ApiService {
       _send(() => _client.get(_uri(path), headers: _headers));
 
   Future<ApiResponse<dynamic>> _post(String path, dynamic body) =>
-      _send(() => _client.post(_uri(path), headers: _headers, body: jsonEncode(body)));
+      _send(() =>
+          _client.post(_uri(path), headers: _headers, body: jsonEncode(body)));
 
   Future<ApiResponse<dynamic>> _send(
     Future<http.Response> Function() request,
@@ -65,9 +66,11 @@ class ApiService {
       final response = await request().timeout(AppConstants.requestTimeout);
       return _parseResponse(response);
     } on TimeoutException {
-      return ApiResponse.error('timeout', 'The server is taking longer than expected. Please try again.');
+      return ApiResponse.error(
+          'timeout', 'The server is taking longer than expected. Please try again.');
     } on SocketException {
-      return ApiResponse.error('network_unavailable', 'Please check your internet connection and try again.');
+      return ApiResponse.error(
+          'network_unavailable', 'Please check your internet connection and try again.');
     } on FormatException {
       return ApiResponse.error('invalid_json', 'The server returned an unreadable response.');
     } catch (e) {
@@ -80,7 +83,8 @@ class ApiService {
       if (response.body.trim().isEmpty) {
         return response.statusCode >= 200 && response.statusCode < 300
             ? ApiResponse(success: true)
-            : ApiResponse.error('http_error', 'Request failed with status ${response.statusCode}');
+            : ApiResponse.error(
+                'http_error', 'Request failed with status ${response.statusCode}');
       }
 
       final decoded = jsonDecode(response.body);
@@ -93,7 +97,18 @@ class ApiService {
             err['message']?.toString() ?? 'Error',
           );
         }
-        return ApiResponse.error('http_error', 'HTTP ${response.statusCode}');
+        if (decoded is Map) {
+          return ApiResponse.error(
+            'http_error',
+            _extractErrorMessage(decoded) ?? 'HTTP ${response.statusCode}',
+          );
+        }
+        return ApiResponse.error(
+          'http_error',
+          decoded is String && decoded.trim().isNotEmpty
+              ? decoded
+              : 'HTTP ${response.statusCode}',
+        );
       }
 
       if (decoded is! Map<String, dynamic>) {
@@ -106,8 +121,41 @@ class ApiService {
 
       return ApiResponse.fromJson(decoded, (data) => data);
     } catch (_) {
-      return ApiResponse.error('parse_error', 'Failed to parse server response.');
+      return ApiResponse.error(
+          'parse_error', 'Failed to parse server response.');
     }
+  }
+
+  String? _extractErrorMessage(Map<dynamic, dynamic> decoded) {
+    final detail = decoded['detail'];
+    if (detail is String && detail.trim().isNotEmpty) {
+      return detail;
+    }
+    if (detail is List && detail.isNotEmpty) {
+      return detail
+          .map(_formatDetailItem)
+          .where((item) => item.isNotEmpty)
+          .join('\n');
+    }
+    final message = decoded['message'];
+    if (message is String && message.trim().isNotEmpty) {
+      return message;
+    }
+    return null;
+  }
+
+  String _formatDetailItem(dynamic item) {
+    if (item is String) return item;
+    if (item is Map) {
+      final message = item['msg'] ?? item['message'] ?? item['detail'];
+      final location = item['loc'];
+      if (message == null) return item.toString();
+      if (location is List && location.isNotEmpty) {
+        return '${location.join('.')}: $message';
+      }
+      return message.toString();
+    }
+    return item.toString();
   }
 
   Uri _uri(String path) {

@@ -1,8 +1,10 @@
 class AppConstants {
-  static const String developmentBaseUrl = 'http://127.0.0.1:8000';
-  static const String productionBaseUrl =
-      'https://your-render-api.onrender.com';
-  static const Duration requestTimeout = Duration(seconds: 15);
+  static const String developmentBaseUrl =
+    'https://gita-setu-v3.onrender.com';
+
+static const String productionBaseUrl =
+    'https://gita-setu-v3.onrender.com';
+  static const Duration requestTimeout = Duration(seconds: 40);
   static const int requestRetries = 2;
 
   static const String _baseUrlOverride = String.fromEnvironment(

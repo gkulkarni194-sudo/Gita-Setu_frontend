@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../local/cache_local_service.dart';
@@ -33,11 +34,23 @@ final guruRepositoryProvider = Provider<GuruRepository>((ref) {
 });
 
 final dailyShlokaProvider = FutureProvider((ref) {
-  return ref.watch(gitaRepositoryProvider).getDailyShloka();
+  return ref.watch(gitaRepositoryProvider).getDailyShloka().then((shloka) {
+    debugPrint(
+      'GITA PARSED: daily shloka ${shloka == null ? 'missing' : 'loaded'}',
+    );
+    return shloka;
+  });
 });
 
 final chapterShlokasProvider = FutureProvider.family((ref, int chapter) {
-  return ref.watch(gitaRepositoryProvider).getChapterShlokas(chapter);
+  return ref.watch(gitaRepositoryProvider).getChapterShlokas(chapter).then(
+    (shlokas) {
+      debugPrint(
+        'GITA PARSED: chapter $chapter shloka count ${shlokas.length}',
+      );
+      return shlokas;
+    },
+  );
 });
 
 final gurusProvider = FutureProvider((ref) {

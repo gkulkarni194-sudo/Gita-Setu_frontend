@@ -8,8 +8,6 @@ class GuruRepository {
   final ApiService _api;
   final CacheLocalService _cache;
 
-  static const _cacheKey = 'cached_gurus';
-
   Future<List<Guru>> getGurus() async {
     final res = await _api.getGurus();
 
@@ -25,7 +23,7 @@ class GuruRepository {
     // Network failed — attempt cache fallback.
     final cached = _cache.getGuruList(allowExpired: true);
     if (cached != null && cached.isNotEmpty) {
-      return cached.map((e) => Guru.fromJson(e as Map<String, dynamic>)).toList();
+      return cached.map(Guru.fromJson).toList();
     }
 
     throw Exception(res.error?.message ?? 'Failed to fetch gurus.');

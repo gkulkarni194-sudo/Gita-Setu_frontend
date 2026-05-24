@@ -25,14 +25,23 @@ class ShlokaModel {
       return 0;
     }
 
+    final siva = json['siva'];
+    final sivaMap = siva is Map ? siva : const <String, dynamic>{};
+
     return ShlokaModel(
       id: json['id']?.toString() ?? '',
       chapter: parseInt(json['chapter']),
       verse: parseInt(json['verse']),
-      sanskrit: json['sanskrit']?.toString() ?? '',
+      sanskrit: json['sanskrit']?.toString() ?? json['slok']?.toString() ?? '',
       transliteration: json['transliteration']?.toString() ?? '',
-      english: json['english']?.toString() ?? '',
-      purport: json['purport']?.toString() ?? '',
+      english: json['english']?.toString() ??
+          json['translation']?.toString() ??
+          sivaMap['et']?.toString() ??
+          '',
+      purport: json['purport']?.toString() ??
+          json['meaning']?.toString() ??
+          sivaMap['ec']?.toString() ??
+          '',
     );
   }
 

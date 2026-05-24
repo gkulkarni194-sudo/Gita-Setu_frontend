@@ -31,8 +31,6 @@ class AiRepository {
         () {
       final payload = <String, dynamic>{
         'input': normalized,
-        'question': normalized,
-        'history': history,
       };
       if (chapter != null) payload['chapter'] = chapter;
       if (verse != null) payload['verse'] = verse;

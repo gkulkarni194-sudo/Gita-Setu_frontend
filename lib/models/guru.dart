@@ -17,15 +17,24 @@ class Guru {
 
   factory Guru.fromJson(Map<String, dynamic> json) {
     final raw = json['specializations'];
+    final expertise = json['expertise']?.toString().trim() ?? '';
+    final expertiseParts = expertise
+        .split(',')
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
+    final specializations = raw is List
+        ? raw.map((e) => e.toString()).toList()
+        : expertiseParts;
+
     return Guru(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
-      title: json['title']?.toString() ?? '',
-      specializations: raw is List
-          ? raw.map((e) => e.toString()).toList()
-          : <String>[],
+      title: json['title']?.toString() ??
+          (expertiseParts.isNotEmpty ? expertiseParts.first : expertise),
+      specializations: specializations,
       contact: json['contact']?.toString() ?? '',
-      available: json['available'] == true,
+      available: json['available'] != false,
     );
   }
 
@@ -33,9 +42,16 @@ class Guru {
   /// id is excluded — the server assigns it on insert.
   /// admin_key is injected by GuruRepository, not stored on the model.
   Map<String, dynamic> toJson() => {
+        'id': id,
         'name': name,
         'title': title,
         'specializations': specializations,
+        'expertise': [
+          if (title.trim().isNotEmpty) title.trim(),
+          ...specializations.map((item) => item.trim()).where(
+                (item) => item.isNotEmpty,
+              ),
+        ].join(', '),
         'contact': contact,
         'available': available,
       };

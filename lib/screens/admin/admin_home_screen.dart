@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
 import '../../widgets/admin_guard.dart';
 import 'admin_mentor_screen.dart';
 import 'admin_settings_screen.dart';
-import '../../constants/app_constants.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -77,6 +74,7 @@ class _DashboardMetrics {
     required this.activeProtocols,
   });
 
+  // ignore: unused_element
   factory _DashboardMetrics.fromJson(Map<String, dynamic> json) {
     return _DashboardMetrics(
       databaseConnected: json['database_connected'] as String? ?? '—',
@@ -112,30 +110,10 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
 
   Future<void> _fetchMetrics() async {
     setState(() {
-      _loading = true;
-      _error = null;
+      _metrics = null;
+      _error = 'Admin dashboard endpoint is not available on this backend.';
+      _loading = false;
     });
-    try {
-      final uri = Uri.parse('${AppConstants.baseUrl}/admin/dashboard');
-      final res = await http.get(uri).timeout(const Duration(seconds: 10));
-      final body = jsonDecode(res.body) as Map<String, dynamic>;
-
-      // Flat error envelope from Bug 4 fix
-      if (body['status'] == 'error') {
-        throw Exception(body['response'] ?? 'Unknown server error');
-      }
-
-      final data = body['data'] as Map<String, dynamic>? ?? body;
-      setState(() {
-        _metrics = _DashboardMetrics.fromJson(data);
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _loading = false;
-      });
-    }
   }
 
   @override
@@ -422,7 +400,8 @@ class _ProtocolChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1a1560).withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF1a1560).withValues(alpha: 0.2)),
+        border:
+            Border.all(color: const Color(0xFF1a1560).withValues(alpha: 0.2)),
       ),
       child: Text(
         label,
@@ -468,8 +447,7 @@ class _ErrorCard extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style:
-                GoogleFonts.lato(fontSize: 12, color: AppColors.warmGrey),
+            style: GoogleFonts.lato(fontSize: 12, color: AppColors.warmGrey),
           ),
           const SizedBox(height: 16),
           TextButton.icon(

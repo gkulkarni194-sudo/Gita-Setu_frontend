@@ -20,14 +20,19 @@ class ApiResponse<T> {
       );
     } else {
       final rawError = json['error'];
+      final rawMessage = json['message'];
       return ApiResponse<T>(
         success: false,
-        error: rawError is Map
-            ? ApiError.fromJson(Map<String, dynamic>.from(rawError))
-            : ApiError(
-                code: 'unknown',
-                message: rawError?.toString() ?? 'No error provided',
-              ),
+        error: ApiError(
+          code: rawError is Map
+              ? rawError['code']?.toString() ?? 'unknown'
+              : 'unknown',
+          message: rawMessage?.toString() ??
+              (rawError is Map
+                  ? rawError['message']?.toString()
+                  : rawError?.toString()) ??
+              'No error provided',
+        ),
       );
     }
   }

@@ -1,4 +1,3 @@
-
 // lib/screens/gita/shloka_detail_screen.dart
 
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ class ShlokaDetailScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const AiChatScreen()),
+          MaterialPageRoute(builder: (_) => AiChatScreen(shloka: shloka)),
         ),
         backgroundColor: AppColors.primary,
         child: const Text('🪷', style: TextStyle(fontSize: 20)),
@@ -69,7 +68,7 @@ class ShlokaDetailScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              shloka.sanskrit ?? '',
+                              shloka.sanskrit,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.tiroDevanagariSanskrit(
                                 fontSize: 22,
@@ -80,7 +79,7 @@ class ShlokaDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              shloka.transliteration ?? '',
+                              shloka.transliteration,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.lato(
                                 fontSize: 15,
@@ -110,24 +109,26 @@ class ShlokaDetailScreen extends StatelessWidget {
                           height: 1.6,
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Meaning & Purport',
-                        style: GoogleFonts.playfairDisplay(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.darkBrown,
+                      if (shloka.purport.trim().isNotEmpty) ...[
+                        const SizedBox(height: 24),
+                        Text(
+                          'Purport',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.darkBrown,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        shloka.purport.isNotEmpty ? shloka.purport : shloka.english,
-                        style: GoogleFonts.lato(
-                          fontSize: 15,
-                          color: AppColors.warmGrey,
-                          height: 1.6,
+                        const SizedBox(height: 12),
+                        Text(
+                          shloka.purport,
+                          style: GoogleFonts.lato(
+                            fontSize: 15,
+                            color: AppColors.warmGrey,
+                            height: 1.6,
+                          ),
                         ),
-                      ),
+                      ],
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -135,9 +136,9 @@ class ShlokaDetailScreen extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.cardBg,
-                  border: const Border(
+                  border: Border(
                     top: BorderSide(color: AppColors.border, width: 1),
                   ),
                 ),

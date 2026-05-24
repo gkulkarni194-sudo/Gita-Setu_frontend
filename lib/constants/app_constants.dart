@@ -1,24 +1,7 @@
 class AppConstants {
-  static const String developmentBaseUrl =
-    'https://gita-setu-v3.onrender.com';
-
-static const String productionBaseUrl =
-    'https://gita-setu-v3.onrender.com';
-  static const Duration requestTimeout = Duration(seconds: 40);
+  static const String baseUrl = 'https://gita-setu-v3-oazx.onrender.com';
+  static const Duration requestTimeout = Duration(seconds: 120);
   static const int requestRetries = 2;
-
-  static const String _baseUrlOverride = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: '',
-  );
-
-  static String get baseUrl {
-    if (_baseUrlOverride.trim().isNotEmpty) {
-      return _baseUrlOverride.trim();
-    }
-    const bool isProduction = bool.fromEnvironment('dart.vm.product');
-    return isProduction ? productionBaseUrl : developmentBaseUrl;
-  }
 
   static const List<Map<String, String>> chapters = [
     {

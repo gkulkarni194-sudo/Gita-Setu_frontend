@@ -32,6 +32,9 @@ class ApiService {
         'admin_key': adminKey,
       }).then(_withGuruMapData);
 
+  Future<ApiResponse<dynamic>> deleteGuru(String guruId, String adminKey) =>
+      _delete('/gurus/$guruId', {'admin_key': adminKey});
+
   Future<ApiResponse<dynamic>> explainQuery(Map<String, dynamic> payload) =>
       _post('/explain', payload);
 
@@ -64,6 +67,9 @@ class ApiService {
   Future<ApiResponse<dynamic>> _post(String path, dynamic body) =>
       _send('POST', path, body: body);
 
+  Future<ApiResponse<dynamic>> _delete(String path, dynamic body) =>
+      _send('DELETE', path, body: body);
+
   Future<ApiResponse<dynamic>> _send(
     String method,
     String path, {
@@ -74,13 +80,20 @@ class ApiService {
     debugPrint('API REQUEST: $method $uri ${encodedBody ?? ''}');
 
     try {
-      final response = method == 'POST'
-          ? await _client
-              .post(uri, headers: _headers, body: encodedBody)
-              .timeout(AppConstants.requestTimeout)
-          : await _client
-              .get(uri, headers: _headers)
-              .timeout(AppConstants.requestTimeout);
+      final http.Response response;
+      if (method == 'POST') {
+        response = await _client
+            .post(uri, headers: _headers, body: encodedBody)
+            .timeout(AppConstants.requestTimeout);
+      } else if (method == 'DELETE') {
+        response = await _client
+            .delete(uri, headers: _headers, body: encodedBody)
+            .timeout(AppConstants.requestTimeout);
+      } else {
+        response = await _client
+            .get(uri, headers: _headers)
+            .timeout(AppConstants.requestTimeout);
+      }
       debugPrint('API RESPONSE: ${response.statusCode} ${response.body}');
       return _parseResponse(response);
     } on TimeoutException catch (e) {

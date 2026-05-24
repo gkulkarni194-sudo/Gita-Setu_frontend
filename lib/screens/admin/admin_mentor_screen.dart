@@ -453,8 +453,29 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: OutlinedButton.icon(
-                                        onPressed: () =>
-                                            ref.invalidate(gurusProvider),
+                                        onPressed: () async {
+                                          try {
+                                            final adminKey =
+                                                ref.read(adminPasswordProvider);
+                                            await ref
+                                                .read(guruRepositoryProvider)
+                                                .deleteGuru(
+                                                  m.id,
+                                                  adminKey: adminKey,
+                                                );
+                                            ref.invalidate(gurusProvider);
+                                          } catch (e) {
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Failed to remove guru: $e',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
                                         icon: const Icon(
                                             Icons.delete_outline,
                                             size: 16),

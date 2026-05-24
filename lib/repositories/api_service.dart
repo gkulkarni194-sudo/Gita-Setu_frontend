@@ -32,8 +32,10 @@ class ApiService {
         'admin_key': adminKey,
       }).then(_withGuruMapData);
 
-  Future<ApiResponse<dynamic>> deleteGuru(String guruId, String adminKey) =>
-      _delete('/gurus/$guruId', {'admin_key': adminKey});
+  Future<ApiResponse<dynamic>> deleteGuru(String guruId, String adminKey) {
+    final encodedAdminKey = Uri.encodeQueryComponent(adminKey);
+    return _sendDelete('/gurus/$guruId?admin_key=$encodedAdminKey');
+  }
 
   Future<ApiResponse<dynamic>> explainQuery(Map<String, dynamic> payload) =>
       _post('/explain', payload);
@@ -67,9 +69,6 @@ class ApiService {
   Future<ApiResponse<dynamic>> _post(String path, dynamic body) =>
       _send('POST', path, body: body);
 
-  Future<ApiResponse<dynamic>> _delete(String path, dynamic body) =>
-      _send('DELETE', path, body: body);
-
   Future<ApiResponse<dynamic>> _send(
     String method,
     String path, {
@@ -84,10 +83,6 @@ class ApiService {
       if (method == 'POST') {
         response = await _client
             .post(uri, headers: _headers, body: encodedBody)
-            .timeout(AppConstants.requestTimeout);
-      } else if (method == 'DELETE') {
-        response = await _client
-            .delete(uri, headers: _headers, body: encodedBody)
             .timeout(AppConstants.requestTimeout);
       } else {
         response = await _client
@@ -111,6 +106,36 @@ class ApiService {
           'invalid_json', 'The server returned an unreadable response: $e');
     } catch (e) {
       debugPrint('API EXCEPTION: $method $uri $e');
+      return ApiResponse.error(
+          'unknown_error', 'Something went wrong: ${e.toString()}');
+    }
+  }
+
+  Future<ApiResponse<dynamic>> _sendDelete(String path) async {
+    final uri = _uri(path);
+    debugPrint('API REQUEST: DELETE $uri');
+
+    try {
+      final response = await _client
+          .delete(uri, headers: _acceptHeaders)
+          .timeout(AppConstants.requestTimeout);
+      debugPrint('API RESPONSE: ${response.statusCode} ${response.body}');
+      return _parseResponse(response);
+    } on TimeoutException catch (e) {
+      debugPrint('API EXCEPTION: DELETE $uri $e');
+      return ApiResponse.error('timeout', e.toString());
+    } on SocketException catch (e) {
+      debugPrint('API EXCEPTION: DELETE $uri $e');
+      return ApiResponse.error('network_unavailable', e.toString());
+    } on http.ClientException catch (e) {
+      debugPrint('API EXCEPTION: DELETE $uri $e');
+      return ApiResponse.error('client_exception', e.toString());
+    } on FormatException catch (e) {
+      debugPrint('API EXCEPTION: DELETE $uri $e');
+      return ApiResponse.error(
+          'invalid_json', 'The server returned an unreadable response: $e');
+    } catch (e) {
+      debugPrint('API EXCEPTION: DELETE $uri $e');
       return ApiResponse.error(
           'unknown_error', 'Something went wrong: ${e.toString()}');
     }
@@ -259,6 +284,10 @@ class ApiService {
 
   Map<String, String> get _headers => const {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+  Map<String, String> get _acceptHeaders => const {
         'Accept': 'application/json',
       };
 }

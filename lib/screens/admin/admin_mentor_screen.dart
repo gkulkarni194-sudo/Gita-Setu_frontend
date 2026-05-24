@@ -60,7 +60,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.close, color: AppColors.warmGrey),
+                        child:
+                            const Icon(Icons.close, color: AppColors.warmGrey),
                       ),
                     ],
                   ),
@@ -69,7 +70,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                   const SizedBox(height: 12),
                   _buildEditField('Title', titleCtrl),
                   const SizedBox(height: 12),
-                  _buildEditField('Specializations (comma separated)', specsCtrl),
+                  _buildEditField(
+                      'Specializations (comma separated)', specsCtrl),
                   const SizedBox(height: 12),
                   _buildEditField('Contact (email / phone)', contactCtrl),
                   const SizedBox(height: 20),
@@ -136,8 +138,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content:
-                                        Text('Failed to save guru: $e'),
+                                    content: Text('Failed to save guru: $e'),
                                   ),
                                 );
                               } finally {
@@ -206,8 +207,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
-            style:
-                GoogleFonts.lato(fontSize: 14, color: AppColors.darkBrown),
+            style: GoogleFonts.lato(fontSize: 14, color: AppColors.darkBrown),
           ),
         ),
       ],
@@ -275,8 +275,8 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('Failed to load gurus',
-                              style: GoogleFonts.lato(
-                                  color: AppColors.warmGrey)),
+                              style:
+                                  GoogleFonts.lato(color: AppColors.warmGrey)),
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
                             onPressed: () => ref.invalidate(gurusProvider),
@@ -295,14 +295,12 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                         return Center(
                           child: Text(
                             'No gurus found in database.',
-                            style: GoogleFonts.lato(
-                                color: AppColors.warmGrey),
+                            style: GoogleFonts.lato(color: AppColors.warmGrey),
                           ),
                         );
                       }
                       return ListView.builder(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 24),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         itemCount: gurus.length,
                         itemBuilder: (context, index) {
                           final m = gurus[index];
@@ -312,8 +310,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border:
-                                  Border.all(color: AppColors.border),
+                              border: Border.all(color: AppColors.border),
                             ),
                             child: Column(
                               children: [
@@ -332,8 +329,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                           m.name.isNotEmpty
                                               ? m.name[0].toUpperCase()
                                               : '?',
-                                          style: GoogleFonts
-                                              .playfairDisplay(
+                                          style: GoogleFonts.playfairDisplay(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.darkBrown,
@@ -349,8 +345,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         children: [
                                           Text(
                                             m.name,
-                                            style: GoogleFonts
-                                                .playfairDisplay(
+                                            style: GoogleFonts.playfairDisplay(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.darkBrown,
@@ -368,15 +363,13 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                       ),
                                     ),
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: m.available
                                             ? Colors.green.shade50
                                             : Colors.red.shade50,
-                                        borderRadius:
-                                            BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: m.available
                                               ? Colors.green
@@ -384,9 +377,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        m.available
-                                            ? 'Active'
-                                            : 'Inactive',
+                                        m.available ? 'Active' : 'Inactive',
                                         style: GoogleFonts.lato(
                                           fontSize: 11,
                                           color: m.available
@@ -406,8 +397,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: AppColors.background,
-                                      borderRadius:
-                                          BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -435,18 +425,15 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                     Expanded(
                                       child: OutlinedButton.icon(
                                         onPressed: () => _editMentor(m),
-                                        icon: const Icon(Icons.edit,
-                                            size: 16),
+                                        icon: const Icon(Icons.edit, size: 16),
                                         label: const Text('Edit'),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor:
-                                              AppColors.primary,
+                                          foregroundColor: AppColors.primary,
                                           side: const BorderSide(
                                               color: AppColors.primary),
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      10)),
+                                                  BorderRadius.circular(10)),
                                         ),
                                       ),
                                     ),
@@ -461,7 +448,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                                 .read(guruRepositoryProvider)
                                                 .deleteGuru(
                                                   m.id,
-                                                  adminKey: adminKey,
+                                                  adminKey,
                                                 );
                                             ref.invalidate(gurusProvider);
                                           } catch (e) {
@@ -476,8 +463,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                             );
                                           }
                                         },
-                                        icon: const Icon(
-                                            Icons.delete_outline,
+                                        icon: const Icon(Icons.delete_outline,
                                             size: 16),
                                         label: const Text('Remove'),
                                         style: OutlinedButton.styleFrom(
@@ -486,8 +472,7 @@ class _AdminMentorScreenState extends ConsumerState<AdminMentorScreen> {
                                               color: Colors.red),
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      10)),
+                                                  BorderRadius.circular(10)),
                                         ),
                                       ),
                                     ),

@@ -38,7 +38,7 @@ class GuruRepository {
     return Guru.fromJson(res.data as Map<String, dynamic>);
   }
 
-  Future<void> deleteGuru(String guruId, {required String adminKey}) async {
+  Future<void> deleteGuru(String guruId, String adminKey) async {
     final res = await _api.deleteGuru(guruId, adminKey);
     if (!res.success) {
       throw Exception(res.error?.message ?? 'Failed to delete guru.');

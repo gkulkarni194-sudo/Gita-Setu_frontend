@@ -15,29 +15,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String _selectedTheme = 'Cream';
   bool _notifications = true;
   bool _dailyShloka = true;
   bool _soundEnabled = true;
-
-  final List<Map<String, dynamic>> _themes = [
-    {
-      'name': 'Cream',
-      'bg': const Color(0xFFFDF8EE),
-      'accent': const Color(0xFFFF6B00)
-    },
-    {'name': 'White', 'bg': Colors.white, 'accent': const Color(0xFFFF6B00)},
-    {
-      'name': 'Grey',
-      'bg': const Color(0xFFF5F5F5),
-      'accent': const Color(0xFF607D8B)
-    },
-    {
-      'name': 'Dark',
-      'bg': const Color(0xFF1a1a2e),
-      'accent': const Color(0xFFFF6B00)
-    },
-  ];
 
   void _editName() {
     final service = ProfileLocalService(
@@ -163,77 +143,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                       trailing: const Icon(Icons.arrow_forward_ios,
                           size: 14, color: AppColors.warmGrey)),
-                ]),
-                const SizedBox(height: 20),
-
-                // Appearance section
-                _buildSectionTitle('🎨 Appearance'),
-                _buildCard(children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Color Theme',
-                            style: GoogleFonts.lato(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.darkBrown,
-                            )),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: _themes
-                              .map((theme) => GestureDetector(
-                                    onTap: () => setState(
-                                        () => _selectedTheme = theme['name']),
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          width: 52,
-                                          height: 52,
-                                          decoration: BoxDecoration(
-                                            color: theme['bg'],
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: _selectedTheme ==
-                                                      theme['name']
-                                                  ? AppColors.primary
-                                                  : AppColors.border,
-                                              width: _selectedTheme ==
-                                                      theme['name']
-                                                  ? 3
-                                                  : 1,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black
-                                                    .withValues(alpha: 0.1),
-                                                blurRadius: 4,
-                                              ),
-                                            ],
-                                          ),
-                                          child: _selectedTheme == theme['name']
-                                              ? const Icon(Icons.check,
-                                                  color: AppColors.primary,
-                                                  size: 20)
-                                              : null,
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(theme['name'],
-                                            style: GoogleFonts.lato(
-                                              fontSize: 11,
-                                              color: AppColors.warmGrey,
-                                            )),
-                                      ],
-                                    ),
-                                  ))
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  ),
                 ]),
                 const SizedBox(height: 20),
 

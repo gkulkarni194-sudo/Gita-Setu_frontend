@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../theme/app_theme.dart';
-import '../../widgets/flower_background.dart';
 import '../../widgets/admin_guard.dart';
+import '../../widgets/flower_background.dart';
 import 'admin_mentor_screen.dart';
 import 'admin_settings_screen.dart';
 
@@ -16,10 +17,10 @@ class AdminHomeScreen extends StatefulWidget {
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const AdminDashboardTab(),
-    const AdminMentorScreen(),
-    const AdminSettingsScreen(),
+  final List<Widget> _screens = const [
+    AdminDashboardTab(),
+    AdminMentorScreen(),
+    AdminSettingsScreen(),
   ];
 
   @override
@@ -43,14 +44,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             unselectedItemColor: Colors.white54,
             items: const [
               BottomNavigationBarItem(
-                  icon: Text('📊', style: TextStyle(fontSize: 22)),
-                  label: 'Dashboard'),
+                icon: Icon(Icons.dashboard_outlined),
+                label: 'Dashboard',
+              ),
               BottomNavigationBarItem(
-                  icon: Text('🧘', style: TextStyle(fontSize: 22)),
-                  label: 'Mentors'),
+                icon: Icon(Icons.self_improvement_outlined),
+                label: 'Gurus',
+              ),
               BottomNavigationBarItem(
-                  icon: Text('⚙️', style: TextStyle(fontSize: 22)),
-                  label: 'Settings'),
+                icon: Icon(Icons.settings_outlined),
+                label: 'Settings',
+              ),
             ],
           ),
         ),
@@ -59,116 +63,52 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Model
-// ---------------------------------------------------------------------------
-
-class _DashboardMetrics {
-  final String databaseConnected;
-  final String aiEngine;
-  final List<String> activeProtocols;
-
-  const _DashboardMetrics({
-    required this.databaseConnected,
-    required this.aiEngine,
-    required this.activeProtocols,
-  });
-
-  // ignore: unused_element
-  factory _DashboardMetrics.fromJson(Map<String, dynamic> json) {
-    return _DashboardMetrics(
-      databaseConnected: json['database_connected'] as String? ?? '—',
-      aiEngine: json['ai_engine'] as String? ?? '—',
-      activeProtocols: (json['active_protocols'] as List<dynamic>? ?? [])
-          .map((e) => e.toString())
-          .toList(),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tab
-// ---------------------------------------------------------------------------
-
-class AdminDashboardTab extends StatefulWidget {
+class AdminDashboardTab extends StatelessWidget {
   const AdminDashboardTab({super.key});
-
-  @override
-  State<AdminDashboardTab> createState() => _AdminDashboardTabState();
-}
-
-class _AdminDashboardTabState extends State<AdminDashboardTab> {
-  _DashboardMetrics? _metrics;
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchMetrics();
-  }
-
-  Future<void> _fetchMetrics() async {
-    setState(() {
-      _metrics = null;
-      _error = 'Admin dashboard endpoint is not available on this backend.';
-      _loading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FlowerBackground(
         child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _fetchMetrics,
-            color: AppColors.primary,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAdminBadge(),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Admin Dashboard',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkBrown,
-                    ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAdminBadge(),
+                const SizedBox(height: 16),
+                Text(
+                  'Admin Dashboard',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkBrown,
                   ),
-                  Text(
-                    'Live backend protocol metrics',
-                    style: GoogleFonts.lato(
-                        fontSize: 14, color: AppColors.warmGrey),
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  'Quick Actions',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkBrown,
                   ),
-                  const SizedBox(height: 28),
-                  _buildMetricsSection(),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Quick Actions',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkBrown,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildActionCard(
+                ),
+                const SizedBox(height: 16),
+                _buildActionCard(
+                  context,
+                  Icons.self_improvement_outlined,
+                  'Manage Gurus',
+                  'Add, edit or remove guru profiles and schedules',
+                  () => Navigator.push(
                     context,
-                    '🧘',
-                    'Manage Mentors',
-                    'Add, edit or remove mentor profiles and schedules',
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const AdminMentorScreen())),
+                    MaterialPageRoute(
+                      builder: (_) => const AdminMentorScreen(),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -186,7 +126,8 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('🛡️', style: TextStyle(fontSize: 12)),
+          const Icon(Icons.admin_panel_settings,
+              size: 14, color: AppColors.gold),
           const SizedBox(width: 6),
           Text(
             'ADMIN',
@@ -202,134 +143,13 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
     );
   }
 
-  Widget _buildMetricsSection() {
-    if (_loading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 40),
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-      );
-    }
-
-    if (_error != null) {
-      return _ErrorCard(message: _error!, onRetry: _fetchMetrics);
-    }
-
-    final m = _metrics!;
-    return Column(
-      children: [
-        _buildMetricRow('🗄️', 'Database', m.databaseConnected),
-        const SizedBox(height: 12),
-        _buildMetricRow('🤖', 'AI Engine', m.aiEngine),
-        const SizedBox(height: 12),
-        _buildProtocolsCard(m.activeProtocols),
-      ],
-    );
-  }
-
-  Widget _buildMetricRow(String emoji, String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.07),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: AppColors.warmGrey,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.8),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkBrown,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(
-              color: Color(0xFF4CAF50),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProtocolsCard(List<String> protocols) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.07),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('⚡', style: TextStyle(fontSize: 22)),
-              const SizedBox(width: 10),
-              Text(
-                'ACTIVE PROTOCOLS',
-                style: GoogleFonts.lato(
-                  fontSize: 11,
-                  color: AppColors.warmGrey,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: protocols.map((p) => _ProtocolChip(label: p)).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionCard(BuildContext context, String emoji, String title,
-      String subtitle, VoidCallback onTap) {
+  Widget _buildActionCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -356,108 +176,38 @@ class _AdminDashboardTabState extends State<AdminDashboardTab> {
                 color: AppColors.saffronLight,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22))),
+              child: Icon(icon, color: AppColors.primary, size: 24),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.darkBrown,
-                      )),
-                  Text(subtitle,
-                      style: GoogleFonts.lato(
-                          fontSize: 12, color: AppColors.warmGrey)),
+                  Text(
+                    title,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkBrown,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.lato(
+                      fontSize: 12,
+                      color: AppColors.warmGrey,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios,
-                size: 14, color: AppColors.warmGrey),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.warmGrey,
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Sub-widgets
-// ---------------------------------------------------------------------------
-
-class _ProtocolChip extends StatelessWidget {
-  final String label;
-  const _ProtocolChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1a1560).withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(20),
-        border:
-            Border.all(color: const Color(0xFF1a1560).withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.lato(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: const Color(0xFF1a1560),
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorCard extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorCard({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.red.shade200),
-      ),
-      child: Column(
-        children: [
-          const Text('⚠️', style: TextStyle(fontSize: 32)),
-          const SizedBox(height: 10),
-          Text(
-            'Failed to load metrics',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkBrown,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.lato(fontSize: 12, color: AppColors.warmGrey),
-          ),
-          const SizedBox(height: 16),
-          TextButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 16),
-            label: Text('Retry',
-                style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
-            style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-          ),
-        ],
       ),
     );
   }

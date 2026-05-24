@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/shloka_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
+import '../gita/shloka_detail_screen.dart';
 
 class MoodResponseScreen extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -64,7 +65,10 @@ class MoodResponseScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...shlokas.map(_buildMiniShlokaCard),
+                  ...shlokas.map((shloka) => _buildMiniShlokaCard(
+                        context,
+                        shloka,
+                      )),
                 ],
                 const SizedBox(height: 20),
                 Text(
@@ -83,42 +87,48 @@ class MoodResponseScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMiniShlokaCard(ShlokaModel shloka) {
+  Widget _buildMiniShlokaCard(BuildContext context, ShlokaModel shloka) {
     final preview = shloka.english.length > 120
         ? '${shloka.english.substring(0, 120)}...'
         : shloka.english;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cream,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 1),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ShlokaDetailScreen(shloka: shloka)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'BG ${shloka.chapter}.${shloka.verse}',
-            style: GoogleFonts.lato(
-              fontSize: 11,
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cream,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'BG ${shloka.chapter}.${shloka.verse}',
+              style: GoogleFonts.lato(
+                fontSize: 11,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            preview,
-            style: GoogleFonts.cormorantGaramond(
-              fontSize: 14,
-              color: AppColors.warmGrey,
-              fontStyle: FontStyle.italic,
-              height: 1.6,
+            const SizedBox(height: 6),
+            Text(
+              preview,
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 14,
+                color: AppColors.warmGrey,
+                fontStyle: FontStyle.italic,
+                height: 1.6,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

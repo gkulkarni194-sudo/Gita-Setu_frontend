@@ -53,6 +53,10 @@ final chapterShlokasProvider = FutureProvider.family((ref, int chapter) {
   );
 });
 
+final chapterVideoUrlProvider = FutureProvider.family((ref, int chapter) {
+  return ref.watch(gitaRepositoryProvider).getChapterVideoUrl(chapter);
+});
+
 final gurusProvider = FutureProvider((ref) {
   return ref.watch(guruRepositoryProvider).getGurus();
 });

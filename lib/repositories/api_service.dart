@@ -49,6 +49,9 @@ class ApiService {
   Future<ApiResponse<dynamic>> getChapterShlokas(int chapter) =>
       _get('/chapter/$chapter');
 
+  Future<ApiResponse<dynamic>> getChapterVideo(int chapter) =>
+      _get('/chapter/$chapter/video');
+
   Future<ApiResponse<dynamic>> getDailyShloka() => _get('/daily');
 
   Future<bool> verifyAdmin(String password) async {

@@ -70,16 +70,23 @@ class GitaRepository {
     }
   }
 
+  Future<String?> getChapterVideoUrl(int chapter) async {
+    final response = await _apiService.getChapterVideo(chapter);
+    if (!response.success || response.data == null) return null;
+
+    return _extractFullUrl(response.data);
+  }
+
   Future<List<ShlokaModel>> _fetchChapterShlokas(int chapter) async {
     final response = await _apiService.getChapterShlokas(chapter);
     if (!response.success || response.data == null) {
       return _parseShlokaList(_cache.getChapter(chapter) ?? const []);
     }
-    
+
     final data = response.data;
     final rawList = data is Map ? (data['shlokas'] ?? data['data']) : data;
     if (rawList is! List) return [];
-    
+
     final shlokas = _parseShlokaList(
       rawList
           .whereType<Map>()
@@ -103,9 +110,21 @@ class GitaRepository {
   }
 
   List<ShlokaModel> _parseShlokaList(List<Map<String, dynamic>> maps) {
-    return maps
-        .map(_parseShloka)
-        .whereType<ShlokaModel>()
-        .toList();
+    return maps.map(_parseShloka).whereType<ShlokaModel>().toList();
+  }
+
+  String? _extractFullUrl(dynamic data) {
+    if (data is! Map) return null;
+
+    final fullUrl = data['full_url'];
+    if (fullUrl is String && fullUrl.trim().isNotEmpty) {
+      return fullUrl.trim();
+    }
+
+    final nestedData = data['data'];
+    final nestedUrl = _extractFullUrl(nestedData);
+    if (nestedUrl != null) return nestedUrl;
+
+    return _extractFullUrl(data['video']);
   }
 }

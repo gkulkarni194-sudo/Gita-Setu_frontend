@@ -16,6 +16,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/flower_background.dart';
 import '../../widgets/shloka_card.dart';
 import 'ai_chat_screen.dart';
+import 'chapter_video_player_screen.dart';
 import 'shloka_detail_screen.dart';
 
 class ChapterDetailScreen extends ConsumerStatefulWidget {
@@ -153,13 +154,15 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
                           const SizedBox(height: 24),
                           ChapterCompletionCard(chapterNum: chapterNum),
                           const SizedBox(height: 24),
+                          WatchChapterRecitalButton(chapterNum: chapterNum),
+                          const SizedBox(height: 24),
                         ],
                       );
                     }
 
                     return ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      itemCount: items.length + 2,
+                      itemCount: items.length + 3,
                       itemBuilder: (context, index) {
                         if (index == items.length) {
                           return Padding(
@@ -177,6 +180,14 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
                             ),
                           );
                         }
+                        if (index == items.length + 2) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            child: WatchChapterRecitalButton(
+                              chapterNum: chapterNum,
+                            ),
+                          );
+                        }
 
                         final shloka = items[index];
                         return ShlokaCard(
@@ -184,7 +195,8 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ShlokaDetailScreen(shloka: shloka),
+                              builder: (_) =>
+                                  ShlokaDetailScreen(shloka: shloka),
                             ),
                           ),
                           onAskKrishna: () => Navigator.push(
@@ -201,6 +213,97 @@ class _ChapterDetailScreenState extends ConsumerState<ChapterDetailScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class WatchChapterRecitalButton extends ConsumerStatefulWidget {
+  final int chapterNum;
+
+  const WatchChapterRecitalButton({super.key, required this.chapterNum});
+
+  @override
+  ConsumerState<WatchChapterRecitalButton> createState() =>
+      _WatchChapterRecitalButtonState();
+}
+
+class _WatchChapterRecitalButtonState
+    extends ConsumerState<WatchChapterRecitalButton> {
+  bool _isLoading = false;
+
+  Future<void> _openVideo() async {
+    setState(() => _isLoading = true);
+
+    try {
+      ref.invalidate(chapterVideoUrlProvider(widget.chapterNum));
+      final videoUrl = await ref.read(
+        chapterVideoUrlProvider(widget.chapterNum).future,
+      );
+      if (!mounted) return;
+
+      if (videoUrl == null || videoUrl.isEmpty) {
+        _showMessage('Chapter recital video is unavailable right now.');
+        return;
+      }
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChapterVideoPlayerScreen(
+            chapterNum: widget.chapterNum,
+            videoUrl: videoUrl,
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Unable to fetch chapter recital video.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : _openVideo,
+        icon: _isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Icon(Icons.play_circle_outline),
+        label: Text(
+          _isLoading ? 'Loading recital...' : 'Watch Chapter Recital',
+          style: GoogleFonts.lato(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.62),
+          disabledForegroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
         ),
       ),
     );

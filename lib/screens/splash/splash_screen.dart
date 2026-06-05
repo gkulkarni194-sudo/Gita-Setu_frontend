@@ -30,23 +30,40 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initVideo() async {
-    _controller = VideoPlayerController.asset('assets/videos/intro.mp4');
-    try {
-      await _controller.initialize();
-      _controller.setLooping(false);
-      _controller.setVolume(1.0);
-      setState(() => _videoInitialized = true);
-      _controller.play();
-      _controller.addListener(() {
-        if (_controller.value.position >= _controller.value.duration) {
-          _navigate();
-        }
-      });
-    } catch (e) {
-      await Future.delayed(const Duration(seconds: 2));
-      _navigate();
-    }
+  try {
+    print("Trying to load video...");
+
+    _controller = VideoPlayerController.asset(
+      'assets/videos/intro.mp4',
+    );
+
+    await _controller.initialize();
+
+    print("Video initialized successfully!");
+    print("Size: ${_controller.value.size}");
+    print("Duration: ${_controller.value.duration}");
+
+    _controller.setLooping(false);
+    _controller.setVolume(1.0);
+
+    setState(() {
+      _videoInitialized = true;
+    });
+
+    _controller.play();
+
+    _controller.addListener(() {
+      if (_controller.value.position >= _controller.value.duration &&
+          !_hasNavigated) {
+        _navigate();
+      }
+    });
+  } catch (e, stackTrace) {
+    print("VIDEO ERROR:");
+    print(e);
+    print(stackTrace);
   }
+}
 
   Future<void> _navigate() async {
     if (_hasNavigated) return;

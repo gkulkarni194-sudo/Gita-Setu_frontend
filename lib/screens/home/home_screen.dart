@@ -192,7 +192,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
                   _buildActionButton(
                     '🧘',
-                    'Contact Guru',
+                    'Contact Mentor',
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(
